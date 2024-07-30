@@ -12,6 +12,8 @@ endif()
 add_executable(prover.exe main.cpp
     formula.h
     formula.cpp
+    common.h
+    common.cpp
 )
 
 include(GNUInstallDirs)
