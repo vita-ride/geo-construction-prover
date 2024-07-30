@@ -10,10 +10,9 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
 endif()
 
 add_executable(prover.exe main.cpp
-    formula.h
-    formula.cpp
-    common.h
-    common.cpp
+    formula.h formula.cpp
+    common.h common.cpp
+    theory.h theory.cpp
 )
 
 include(GNUInstallDirs)

@@ -191,7 +191,7 @@ bool Atomic::read() {
 
     if (NEXTTOKEN == eOPENB) {
         ReadNextToken();
-        while (NEXTTOKEN == eID || NEXTTOKEN == eNUMBER) {
+        while (NEXTTOKEN == eID) {
             Term t;
             t.read();
             args.push_back(t);
@@ -479,3 +479,23 @@ bool Formula::readTPTPStatement(const string &s, string &name, fofType &type) {
         return false;
     }
 }
+
+
+int Formula::univVarIndex(string v) const {
+    for (size_t i = 0; i < numUnivVars(); i++)
+        if (v == univVarAt(i))
+            return i;
+    return -1;
+}
+
+
+bool NormFormula::isFact() const {
+    return numPremises() == 0;
+}
+
+bool NormFormula::isSimpleImplication() const {
+    return numPremises() == 1;
+}
+
+
+

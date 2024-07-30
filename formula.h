@@ -100,13 +100,13 @@ public:
     size_t numUnivVars() const { return universalVars.size(); }
     const string &univVarAt(size_t i) const { return universalVars.at(i); }
     void addUnivVar(const string &varName) { universalVars.push_back(varName); }
+    int univVarIndex(string v) const;
 
     bool read();
     bool readUnivVars();
     bool readImplication();
     bool readWithoutCheckingBoundness();
     bool readTPTPStatement(const string &s, string &name, fofType &type);
-
 
     friend ostream &operator<<(ostream &os, const Formula &f);
 
@@ -136,6 +136,12 @@ public:
         universalVars = nf.universalVars;
         return *this;
     }
+
+    size_t numPremises() const { return premises.size(); }
+
+    bool isFact() const;
+    bool isSimpleImplication() const;
+
 private:
     Conjunction premises;
     Atomic conclusion;
