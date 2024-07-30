@@ -81,25 +81,34 @@ private:
     vector<Atomic> conjuncts;
 };
 
+class NormFormula;
 
 class Formula {
 public:
     Formula() {}
     Formula(const Formula &f)  {
         premises = f.premises;
-        conclusion = f.conclusion;
+        conclusions = f.conclusions;
         universalVars = f.universalVars;
+    }
+    Formula(const Conjunction &prem, const Conjunction &conc) {
+        premises = prem;
+        conclusions = conc;
     }
     Formula &operator=(const Formula &f) {
         premises = f.premises;
-        conclusion = f.conclusion;
+        conclusions = f.conclusions;
         universalVars = f.universalVars;
         return *this;
     }
 
+    size_t numPremises() const { return premises.size(); }
+    size_t numConclusions() const { return conclusions.size(); }
+
     size_t numUnivVars() const { return universalVars.size(); }
     const string &univVarAt(size_t i) const { return universalVars.at(i); }
     void addUnivVar(const string &varName) { universalVars.push_back(varName); }
+    void setUnivVars(const vector<string> &vars) { universalVars = vars; }
     int univVarIndex(string v) const;
 
     bool read();
@@ -110,14 +119,16 @@ public:
 
     friend ostream &operator<<(ostream &os, const Formula &f);
 
+    void normalize(const string &name, vector<pair<NormFormula, string>> &output) const;
+
     void clearUnivVars() { universalVars.clear(); }
     void clear() {
         premises.clear();
-        conclusion.clear();
+        conclusions.clear();
         clearUnivVars();
     }
 private:
-    Conjunction premises, conclusion;
+    Conjunction premises, conclusions;
     vector<string> universalVars;
 };
 
@@ -130,6 +141,10 @@ public:
         conclusion = nf.conclusion;
         universalVars = nf.universalVars;
     }
+    NormFormula(const Conjunction &prem, const Atomic &conc) {
+        premises = prem;
+        conclusion = conc;
+    }
     NormFormula &operator=(const NormFormula &nf) {
         premises = nf.premises;
         conclusion = nf.conclusion;
@@ -139,9 +154,15 @@ public:
 
     size_t numPremises() const { return premises.size(); }
 
+    size_t numUnivVars() const { return universalVars.size(); }
+    const string &univVarAt(size_t i) const { return universalVars.at(i); }
+    void addUnivVar(const string &varName) { universalVars.push_back(varName); }
+    void setUnivVars(const vector<string> &vars) { universalVars = vars; }
+
     bool isFact() const;
     bool isSimpleImplication() const;
 
+    friend ostream &operator<<(ostream &os, const NormFormula &f);
 private:
     Conjunction premises;
     Atomic conclusion;
@@ -208,7 +229,31 @@ inline ostream &operator<<(ostream &os, const Formula &f) {
         os << "] : ";
     }
 
-    if (f.premises.size() > 0) {
+    if (f.numPremises() > 0) {
+        os << "(" << f.premises << " => " << f.conclusions << ")";
+    } else {
+        os << f.conclusions;
+    }
+
+    if (size > 0)
+        os << ")";
+
+    return os;
+}
+
+inline ostream &operator<<(ostream &os, const NormFormula &f) {
+    size_t size = f.numUnivVars();
+    if (size > 0) {
+        os << "(! [";
+        for (size_t i = 0; i < size; i++) {
+            os << f.univVarAt(i);
+            if (i + 1 < size)
+                os << ",";
+        }
+        os << "] : ";
+    }
+
+    if (f.numPremises() > 0) {
         os << "(" << f.premises << " => " << f.conclusion << ")";
     } else {
         os << f.conclusion;
@@ -219,7 +264,6 @@ inline ostream &operator<<(ostream &os, const Formula &f) {
 
     return os;
 }
-
 
 
 #endif // FORMULA_H

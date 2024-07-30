@@ -16,6 +16,7 @@ public:
     bool isConstant(Term t);
     void addPredicate(const string &name, unsigned arity);
 
+    void initNormalized();
 
     vector<pair<Formula, string>> initialAxioms;
     vector<pair<NormFormula, string>> facts;

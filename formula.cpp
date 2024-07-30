@@ -297,9 +297,9 @@ bool Formula::read() {
         }
     }
 
-    for(unsigned i = 0; i < conclusion.size(); i++) {
-        for(unsigned j = 0; j < conclusion.at(i).arity(); j++) {
-            Term t = conclusion.at(i).argAt(j);
+    for(unsigned i = 0; i < numConclusions(); i++) {
+        for(unsigned j = 0; j < conclusions.at(i).arity(); j++) {
+            Term t = conclusions.at(i).argAt(j);
             bool foundArg = false;
 
             for (unsigned l = 0; l < numUnivVars() && !foundArg; l++) {
@@ -327,9 +327,9 @@ bool Formula::read() {
 
             }
         }
-        for(unsigned i = 0; i < conclusion.size() && !foundVar; i++) {
-            for(unsigned j = 0; j < conclusion.at(i).arity()  && !foundVar; j++) {
-                Term t = conclusion.at(i).argAt(j);
+        for(unsigned i = 0; i < numConclusions() && !foundVar; i++) {
+            for(unsigned j = 0; j < conclusions.at(i).arity()  && !foundVar; j++) {
+                Term t = conclusions.at(i).argAt(j);
                 if (var == t.getName()) {
                     foundVar = true;
                 }
@@ -391,12 +391,12 @@ bool Formula::readImplication() {
     NEXTLEXEME = TMP_NEXTLEXEME;
 
     premises.clear();
-    conclusion.clear();
+    conclusions.clear();
     if (!premises.read())
         return false;
     if (NEXTTOKEN == eIMPL) {
         ReadNextToken();
-        if (conclusion.read(true))
+        if (conclusions.read(true))
             return true;
     } else {
         TEXTINDEX = TMP_TEXTINDEX;
@@ -404,8 +404,8 @@ bool Formula::readImplication() {
         NEXTLEXEME = TMP_NEXTLEXEME;
 
         premises.clear();
-        conclusion.clear();
-        if (conclusion.read(true))
+        conclusions.clear();
+        if (conclusions.read(true))
             return true;
     }
     return false;
@@ -488,6 +488,24 @@ int Formula::univVarIndex(string v) const {
     return -1;
 }
 
+// assumes input is valid
+void Formula::normalize(const string &name, vector<pair<NormFormula, string>> &output) const {
+    unsigned count_aux = 0;
+    if (numConclusions() > 1) {
+        for (size_t i = 0; i < numConclusions(); i++) {
+            NormFormula nf(premises, conclusions.at(i));
+            nf.setUnivVars(universalVars);
+            output.push_back(pair<NormFormula, string>(
+                nf, name + "AuxConjConcl" + std::to_string(count_aux++)));
+            count_aux++;
+        }
+        return;
+    } else {
+        NormFormula nf(premises, conclusions.at(0));
+        nf.setUnivVars(universalVars);
+        output.push_back(pair<NormFormula, string>(nf, name));
+    }
+}
 
 bool NormFormula::isFact() const {
     return numPremises() == 0;

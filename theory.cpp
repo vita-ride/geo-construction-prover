@@ -58,3 +58,14 @@ void Theory::addPredicate(const string &name, unsigned arity) {
         predicates.push_back(pair<string, unsigned>(PREFIX_NEGATED + p, arity));
     }
 }
+
+void Theory::initNormalized() {
+    for (auto it = initialAxioms.begin(); it != initialAxioms.end(); it++) {
+        vector<pair<NormFormula, string>> normalized;
+        Formula &ax = it->first;
+        ax.normalize(it->second, normalized);
+        for (size_t i = 0; i < normalized.size(); i++) {
+            addFormula(normalized.at(i).first, normalized.at(i).second);
+        }
+    }
+}
