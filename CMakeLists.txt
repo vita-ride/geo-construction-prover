@@ -5,7 +5,14 @@ project(geo-construction-prover LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(prover.exe main.cpp)
+if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+endif()
+
+add_executable(prover.exe main.cpp
+    formula.h
+    formula.cpp
+)
 
 include(GNUInstallDirs)
 install(TARGETS prover.exe
