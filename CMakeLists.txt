@@ -9,14 +9,14 @@ if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
 endif()
 
-add_executable(prover.exe main.cpp
+add_executable(geoprover main.cpp
     formula.h formula.cpp
     common.h common.cpp
     theory.h theory.cpp
 )
 
 include(GNUInstallDirs)
-install(TARGETS prover.exe
+install(TARGETS geoprover
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

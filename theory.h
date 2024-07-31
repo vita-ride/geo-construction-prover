@@ -8,7 +8,10 @@ class Theory
 public:
     Theory() {}
 
+    bool readTPTP(const string inputFile);
+
     void addAxiom(Formula &axiom, string name);
+    bool setTheorem(Formula &thm, string name);
     void addFormula(NormFormula &formula);
 
     void addConstant(string s);
@@ -23,7 +26,13 @@ public:
     bool canSaturate(const NormFormula &nf1, const NormFormula &nf2,
                      NormFormula &result) const;
 
+
+    void printFormulas();
+
     vector<pair<Formula, string>> initialAxioms;
+    pair<Formula, string> theorem;
+    bool theoremAdded = false;
+
     set<NormFormula> facts;
     vector<NormFormula> simpleImplications;
     vector<NormFormula> complexAxioms;

@@ -8,8 +8,108 @@
  * Original license: GPL-3.0
  */
 
+bool Theory::readTPTP(const string inputFile){
+    ifstream tptp(inputFile, ios::in);
+    string s, tptpstr;
+
+    if (tptp.good()) {
+        while (getline(tptp, s)) {
+            if (s != "" && s.at(0) != '%') {
+                string includeStr = "include";
+                size_t includeIdx = s.find(includeStr);
+                if (includeIdx != string::npos) {
+                    size_t dotIdx = s.find(").", includeIdx+1);
+                    if (dotIdx != string::npos) {
+                        size_t pos = inputFile.find_last_of("\\/");
+                        string filename = (pos == string::npos) ? "" :
+                                              inputFile.substr(0, pos);
+                        if (!filename.empty())
+                            filename += "/";
+                        filename += s.substr(includeIdx + includeStr.size() + 2,
+                                            dotIdx - includeIdx - includeStr.size() - 3);
+
+                        ifstream includedFile(filename, ios::in);
+                        if (includedFile.good()) {
+                            string ss;
+                            while (getline(includedFile, ss)) {
+                                if (ss != "" && ss.at(0) != '%')
+                                    tptpstr+=ss;
+                            }
+                        } else {
+                            cout << "Error reading included file: " << filename << endl;
+                            return false;
+                        }
+                    } else
+                        tptpstr += s;
+                } else
+                    tptpstr += s;
+            }
+        }
+        tptp.close();
+    } else {
+        cout << "Error reading input file" << endl;
+        return false;
+    }
+    string name;
+    Formula f;
+
+    tptpstr = skipChar(tptpstr, ' ');
+
+    size_t fofIdx = tptpstr.find("fof");
+    while (fofIdx != string::npos) {
+        size_t dotIdx = tptpstr.find(".", fofIdx + 1);
+        if (dotIdx == string::npos)
+            return false;
+
+        s = tptpstr.substr(fofIdx, dotIdx - fofIdx);
+        fofType type = eAny;
+        if (f.readTPTPStatement(s, name, type)) {
+            for (size_t i = 0; i < f.numPremises(); i++) {
+                for (size_t j = 0; j < f.premiseAt(i).arity(); j++) {
+                    string arg = f.premiseAt(i).argAt(j).getName();
+                    if (f.univVarIndex(arg) == -1)
+                        addConstant(arg);
+                }
+            }
+            for (size_t i = 0; i < f.numConclusions(); i++) {
+                for (size_t j = 0; j < f.conclusionAt(i).arity(); j++) {
+                    string arg = f.conclusionAt(i).argAt(j).getName();
+                    if (f.univVarIndex(arg) == -1)
+                        addConstant(arg);
+                }
+            }
+            if (type == eAxiom) {
+                addAxiom(f, name);
+                //updatesignature
+            } else if (type == eConjecture) {
+                if (!setTheorem(f, name))
+                    return false;
+            }
+        } else {
+            // ignore unsupported formulas
+        }
+
+        tptpstr = tptpstr.substr(dotIdx + 1, tptpstr.size() - dotIdx - 1);
+        fofIdx = tptpstr.find("fof");
+    }
+    if (!theoremAdded) {
+        cout << "Error: no conjecture given" << endl;
+        return false;
+    }
+    return true;
+}
+
 void Theory::addAxiom(Formula &axiom, string name) {
     initialAxioms.push_back(pair<Formula, string>(axiom, name));
+}
+
+bool Theory::setTheorem(Formula &thm, string name) {
+    if (theoremAdded)
+        return false;
+
+    theorem = pair<Formula, string>(thm, name);
+    theoremAdded = true;
+    return true;
 }
 
 void Theory::addFormula(NormFormula &formula) {
@@ -214,5 +314,23 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
 }
 
 
-
-
+void Theory::printFormulas() {
+    cout << "\tFacts:" << endl;
+    size_t counter = 0;
+    for (auto it = facts.begin(); it != facts.end(); it++) {
+        cout << "\t\tFact " << counter++ << ": " << it->getName()
+             << ": " << *it << endl;
+    }
+    cout << "\tSimple implications:" << endl;
+    for (size_t i = 0; i < simpleImplications.size(); i++) {
+        cout << "\t\tImplication " << i << ": "
+             << simpleImplications.at(i).getName() << ": "
+             << simpleImplications.at(i) << endl;
+    }
+    cout << "\tComplex axioms:" << endl;
+    for (size_t i = 0; i < complexAxioms.size(); i++) {
+        cout << "\t\tAxiom " << i << ": "
+             << complexAxioms.at(i).getName() << ": "
+             << complexAxioms.at(i) << endl;
+    }
+}

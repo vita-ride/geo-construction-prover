@@ -145,7 +145,9 @@ public:
     }
 
     size_t numPremises() const { return premises.size(); }
+    const Atomic &premiseAt(size_t i) const { return premises.at(i); }
     size_t numConclusions() const { return conclusions.size(); }
+    const Atomic &conclusionAt(size_t i) const { return conclusions.at(i); }
 
     size_t numUnivVars() const { return universalVars.size(); }
     const string &univVarAt(size_t i) const { return universalVars.at(i); }

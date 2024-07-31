@@ -453,12 +453,6 @@ bool Formula::readTPTPStatement(const string &s, string &name, fofType &type) {
         return false;
     }
     string s1 = ss.substr(pos1 + 1, pos2 - pos1 - 1);
-    if (type == eAxiom && s1 != string("axiom")) {
-        return false;
-    }
-    if (type == eConjecture && s1 != string("conjecture")) {
-        return false;
-    }
     if (s1 == string("axiom"))
         type = eAxiom;
     else if (s1 == string("conjecture"))
@@ -540,7 +534,6 @@ bool NormFormula::operator<(const NormFormula &nf) const {
 
     map<string, string> repl;
     set<string> values;
-
     for (size_t i = 0; i < conclusion.arity(); i++) {
         bool leftConst = !isUniv(conclusion.argAt(i).getName());
         bool rightConst = !nf.isUniv(nf.getConclusion().argAt(i).getName());
