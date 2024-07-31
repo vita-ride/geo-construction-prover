@@ -112,7 +112,7 @@ bool Theory::setTheorem(Formula &thm, string name) {
     return true;
 }
 
-void Theory::addFormula(NormFormula &formula) {
+void Theory::addFormula(const NormFormula &formula) {
     if (formula.isFact()) {
         facts.insert(formula);
     } else if (formula.isSimpleImplication()) {

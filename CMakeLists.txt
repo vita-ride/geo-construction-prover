@@ -13,6 +13,7 @@ add_executable(geoprover main.cpp
     formula.h formula.cpp
     common.h common.cpp
     theory.h theory.cpp
+    prover.h prover.cpp
 )
 
 include(GNUInstallDirs)

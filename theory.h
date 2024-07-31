@@ -5,6 +5,7 @@
 
 class Theory
 {
+    friend class Prover;
 public:
     Theory() {}
 
@@ -12,7 +13,8 @@ public:
 
     void addAxiom(Formula &axiom, string name);
     bool setTheorem(Formula &thm, string name);
-    void addFormula(NormFormula &formula);
+    const pair<Formula, string> &getTheorem() const { return theorem; }
+    void addFormula(const NormFormula &formula);
 
     void addConstant(string s);
     bool isConstant(Term t) const;

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "theory.h"
+#include "prover.h"
 using namespace std;
 
 int main(int argc, char **argv)
@@ -9,9 +9,11 @@ int main(int argc, char **argv)
     } else {
         string inputFile = argv[1];
         Theory t;
-        t.readTPTP(inputFile);
-        t.initNormalized();
-        t.saturate();
-        t.printFormulas();
+        if(!t.readTPTP(inputFile))
+            return 1;
+
+        Prover p(t);
+        p.initAxioms();
+        p.prove();
     }
 }

@@ -112,9 +112,9 @@ public:
     }
 
     size_t size() const { return conjuncts.size(); }
-    const Atomic &at(size_t i) const {
-        return conjuncts.at(i);
-    }
+    const Atomic &at(size_t i) const { return conjuncts.at(i); }
+    const Atomic &back() const { return conjuncts.back(); }
+    void popBack() { conjuncts.pop_back(); }
     void add(const Atomic &a) { conjuncts.push_back(a); }
 
     bool read(bool conclusion = false);
@@ -202,7 +202,10 @@ public:
 
     size_t numPremises() const { return premises.size(); }
     const Conjunction &getPremises() const { return premises; }
+    void setPremises(const Conjunction &prem) { premises = prem; }
     const Atomic &premiseAt(size_t i) const { return premises.at(i); }
+    const Atomic &premiseBack() const { return premises.back(); }
+    void popPremiseBack() { premises.popBack(); }
 
     const Atomic &getConclusion() const { return conclusion; }
     void setConclusion(const Atomic &conc) { conclusion = conc; }
