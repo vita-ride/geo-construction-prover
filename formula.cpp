@@ -1,7 +1,7 @@
 #include "formula.h"
 
 /*
- * Parts of this code used for parsing include and modify
+ * Parts of this code include and modify
  * code from the Larus repository.
  * Original source: https://github.com/janicicpredrag/Larus
  * Original author: [Predrag Janicic]
@@ -489,22 +489,30 @@ int Formula::univVarIndex(string v) const {
 }
 
 // assumes input is valid
-void Formula::normalize(const string &name, vector<pair<NormFormula, string>> &output) const {
+void Formula::normalize(const string &name, vector<NormFormula> &output) const {
     unsigned count_aux = 0;
     if (numConclusions() > 1) {
         for (size_t i = 0; i < numConclusions(); i++) {
             NormFormula nf(premises, conclusions.at(i));
             nf.setUnivVars(universalVars);
-            output.push_back(pair<NormFormula, string>(
-                nf, name + "AuxConjConcl" + std::to_string(count_aux++)));
+            nf.setName(name + "AuxConjConcl" + std::to_string(count_aux++));
+            output.push_back(nf);
             count_aux++;
         }
         return;
     } else {
         NormFormula nf(premises, conclusions.at(0));
         nf.setUnivVars(universalVars);
-        output.push_back(pair<NormFormula, string>(nf, name));
+        nf.setName(name);
+        output.push_back(nf);
     }
+}
+
+bool NormFormula::isUniv(const string &var) const {
+    for (size_t i = 0; i < numUnivVars(); i++)
+        if (var == univVarAt(i))
+            return true;
+    return false;
 }
 
 bool NormFormula::isFact() const {
@@ -515,5 +523,53 @@ bool NormFormula::isSimpleImplication() const {
     return numPremises() == 1;
 }
 
+bool NormFormula::operator<(const NormFormula &nf) const {
+    // expected to be used when there are no premises
+    if (conclusion.getName() < nf.conclusion.getName())
+        return true;
+    if (conclusion.getName() > nf.conclusion.getName())
+        return false;
+    if (numUnivVars() < nf.numUnivVars())
+        return true;
+    if (numUnivVars() > nf.numUnivVars())
+        return false;
+    if (conclusion.arity() < nf.conclusion.arity())
+        return true;
+    if (conclusion.arity() > nf.conclusion.arity())
+        return false;
 
+    map<string, string> repl;
+    set<string> values;
+
+    for (size_t i = 0; i < conclusion.arity(); i++) {
+        bool leftConst = !isUniv(conclusion.argAt(i).getName());
+        bool rightConst = !nf.isUniv(nf.getConclusion().argAt(i).getName());
+        if (leftConst) {
+            if (rightConst) {
+                if (conclusion.argAt(i).getName() < nf.conclusion.argAt(i).getName())
+                    return true;
+                if (conclusion.argAt(i).getName() > nf.conclusion.argAt(i).getName())
+                    return false;
+            } else
+                return true;
+        } else {
+            if (rightConst)
+                return false;
+            else if (repl.find(conclusion.argAt(i).getName()) != repl.end()){
+                if (repl[conclusion.argAt(i).getName()] !=
+                    nf.getConclusion().argAt(i).getName()) {
+                    return true;
+                }
+            } else {
+                repl[conclusion.argAt(i).getName()] =
+                    nf.getConclusion().argAt(i).getName();
+                if (values.find(nf.getConclusion().argAt(i).getName()) != values.end())
+                    return false;
+                values.insert(nf.getConclusion().argAt(i).getName());
+            }
+        }
+    }
+
+    return false;
+}
 

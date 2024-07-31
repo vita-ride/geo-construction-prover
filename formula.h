@@ -18,9 +18,16 @@ public:
     Term (const string &s) {
         name = s;
     }
+    bool operator==(const Term &t) {
+        return name == t.name;
+    }
+    bool operator!=(const Term &t) {
+        return name != t.name;
+    }
     bool read();
 
     const string &getName() const { return name; }
+    void setName(const string &n) { name = n; }
 
 private:
     string name;
@@ -31,6 +38,9 @@ private:
 class Atomic {
 public:
     Atomic() {}
+    Atomic(const string &n) {
+        name = n;
+    }
     Atomic(const Atomic &a) {
         name = a.name;
         args = a.args;
@@ -40,11 +50,40 @@ public:
         args = a.args;
         return *this;
     }
+    bool operator==(const Atomic &a) const {
+        if (name != a.name)
+            return false;
+        for (size_t i = 0; i < arity(); i++) { //assumes arity is the same
+            if (argAt(i) != a.argAt(i))
+                return false;
+        }
+        return true;
+    }
+    bool operator<(const Atomic &a) const {
+        if (name < a.name)
+            return true;
+        if (name > a.name)
+            return false;
+        if (arity() < a.arity())
+            return true;
+        if (arity() > a.arity())
+            return false;
+        for (size_t i = 0; i < arity(); i++) {
+            if (argAt(i).getName() < a.argAt(i).getName())
+                return true;
+            if (argAt(i).getName() > a.argAt(i).getName())
+                return false;
+        }
+        return false;
+    }
     bool read();
 
 
     string getName() const { return name; }
+    void setName(const string &n) { name = n; }
+
     Term argAt(size_t i) const { return args.at(i); }
+    void setArg(size_t i, const string &arg) { args[i].setName(arg); }
     size_t arity() const { return args.size(); }
 
     void clear() {
@@ -68,9 +107,12 @@ public:
         conjuncts = c.conjuncts;
         return *this;
     }
+    bool operator==(const Conjunction &c) const {
+        return conjuncts == c.conjuncts;
+    }
 
     size_t size() const { return conjuncts.size(); }
-    Atomic at(size_t i) const {
+    const Atomic &at(size_t i) const {
         return conjuncts.at(i);
     }
     void add(const Atomic &a) { conjuncts.push_back(a); }
@@ -119,7 +161,7 @@ public:
 
     friend ostream &operator<<(ostream &os, const Formula &f);
 
-    void normalize(const string &name, vector<pair<NormFormula, string>> &output) const;
+    void normalize(const string &name, vector<NormFormula> &output) const;
 
     void clearUnivVars() { universalVars.clear(); }
     void clear() {
@@ -137,6 +179,7 @@ class NormFormula {
 public:
     NormFormula() {}
     NormFormula(const NormFormula &nf) {
+        name = nf.name;
         premises = nf.premises;
         conclusion = nf.conclusion;
         universalVars = nf.universalVars;
@@ -146,24 +189,36 @@ public:
         conclusion = conc;
     }
     NormFormula &operator=(const NormFormula &nf) {
+        name = nf.name;
         premises = nf.premises;
         conclusion = nf.conclusion;
         universalVars = nf.universalVars;
         return *this;
     }
+    const string &getName() const { return name; }
+    void setName(const string &n) { name = n; }
 
     size_t numPremises() const { return premises.size(); }
+    const Conjunction &getPremises() const { return premises; }
+    const Atomic &premiseAt(size_t i) const { return premises.at(i); }
+
+    const Atomic &getConclusion() const { return conclusion; }
+    void setConclusion(const Atomic &conc) { conclusion = conc; }
 
     size_t numUnivVars() const { return universalVars.size(); }
     const string &univVarAt(size_t i) const { return universalVars.at(i); }
     void addUnivVar(const string &varName) { universalVars.push_back(varName); }
     void setUnivVars(const vector<string> &vars) { universalVars = vars; }
 
+    bool isUniv(const string &var) const;
+
     bool isFact() const;
     bool isSimpleImplication() const;
 
+    bool operator<(const NormFormula &nf) const;
     friend ostream &operator<<(ostream &os, const NormFormula &f);
 private:
+    string name;
     Conjunction premises;
     Atomic conclusion;
     vector<string> universalVars;
