@@ -1,9 +1,9 @@
 #include "prover.h"
 
 string findParent(unordered_map<string, string>& parent, string x) {
-    if (!parent[x].empty()) {
-        parent[x] = findParent(parent, parent[x]);
-    }
+    if (parent[x].empty())
+        return x;
+    parent[x] = findParent(parent, parent[x]);
     return parent[x];
 }
 
@@ -41,7 +41,6 @@ void Prover::prove() {
     }
 
     unsigned depth = 0;
-    // todo newPredicates = occuringPredicates
     do {
         if (!newFacts.empty()) {
             theory.saturateFacts(newFacts);
@@ -50,17 +49,13 @@ void Prover::prove() {
                 if (goals.find(it->getConclusion()) != goals.end()) {
                     goals.erase(it->getConclusion());
                     theory.addGoalName(it->getName());
-                    cout << "Goal name: " << it->getName() << endl;
                 }
             }
         }
-        // for (fact: newfacts) newPredicates.insert(fact)
         newFacts.clear();
         for (size_t i = 0; i < theory.complexAxioms.size(); i++) {
-            // if (any premise name in newPredicates)
             generateFacts(theory.complexAxioms.at(i), newFacts);
         }
-        // newPredicates.clear()
         depth++;
     } while (!goals.empty() && depth < 500 && !newFacts.empty());
 
@@ -73,7 +68,8 @@ void Prover::prove() {
     }
 }
 
-void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earlyChecked) {
+void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts,
+                           bool earlyChecked) {
     // early stopping
     if (nf.getConclusion().getName() == EQ_NATIVE_NAME &&
         nf.getConclusion().argAt(0) == nf.getConclusion().argAt(1))
@@ -114,10 +110,11 @@ void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earl
 
     if (nf.numPremises() == 0) {
         if (!earlyChecked) {
-            if(theory.facts.find(nf) != theory.facts.end() ||
+            if (theory.facts.find(nf) != theory.facts.end() ||
                 newFacts.find(nf) != newFacts.end())
                 return;
         }
+
         string oldName = nf.getName();
         nf.setName(oldName + "applied" + to_string(appliedCounter++));
         newFacts.insert(nf);
@@ -156,7 +153,6 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
             univToConst[conc.argAt(i).getName()] = premise.argAt(i).getName();
         }
     }
-
     // univ variables from premise matching with constants in conclusion
     unordered_map<string, string> replConst;
 
@@ -187,6 +183,7 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
             univToUniv[conc.argAt(i).getName()].insert(premise.argAt(i).getName());
         }
     }
+
     // init parents map
     unordered_map<string, string> parents;
     for (auto it = univToUniv.begin(); it != univToUniv.end(); it++) {
@@ -215,15 +212,18 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
             pickedParents.insert(univVar);
         }
     }
+
     // update replConst for parents
     for (size_t i = 0; i < nf.numUnivVars(); i++) {
         string univVar = nf.univVarAt(i);
         string par = findParent(parents, univVar);
         if (univVar != par && replConst.find(univVar) != replConst.end()) {
-            if (replConst.find(par) == replConst.end()) {
+            if (replConst.find(par) != replConst.end()) {
+                if (replConst[par] != replConst[univVar]) {
+                    return false;
+                }
+            } else {
                 replConst[par] = replConst[univVar];
-            } else if (replConst[par] != replConst[univVar]) {
-                return false;
             }
         }
     }
@@ -263,6 +263,7 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
             mergedConclusion.setArg(i, repl[mergedConclusion.argAt(i).getName()]);
         }
     }
+
     merged.setPremises(mergedPremises);
     merged.setConclusion(mergedConclusion);
     merged.setUnivVars(representatives);
@@ -270,6 +271,7 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
     merged.copyOrigin(nf);
     merged.addUsedFact(pair(f.getName(), f.getConclusion()));
     merged.addReplacements(repl);
+
     return true;
 }
 

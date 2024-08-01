@@ -205,7 +205,6 @@ bool Atomic::read() {
             } else
                 ReadNextToken();
         }
-        //if (NEXTTOKEN != eEQ && NEXTTOKEN != eNEQ)
         return true;
     }
 
@@ -482,7 +481,6 @@ int Formula::univVarIndex(string v) const {
     return -1;
 }
 
-// assumes input is valid
 void Formula::normalize(const string &name, vector<NormFormula> &output) const {
     unsigned count_aux = 0;
     if (numConclusions() > 1) {
@@ -527,7 +525,6 @@ void NormFormula::addReplacements(const unordered_map<string, string> &repl) {
 }
 
 bool NormFormula::operator<(const NormFormula &nf) const {
-    // expected to be used when there are no premises
     if (conclusion.getName() < nf.conclusion.getName())
         return true;
     if (conclusion.getName() > nf.conclusion.getName())

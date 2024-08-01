@@ -432,12 +432,9 @@ set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &p
 
 
 void Theory::printProof() {
-    for (auto it = origins.begin(); it != origins.end(); it++) {
-        cout << it->first << endl;
+    for (size_t i = 0; i < goalNames.size(); i++) {
+        printFactOrigin(goalNames.at(i));
     }
-    // for (size_t i = 0; i < goalNames.size(); i++) {
-    //     printFactOrigin(goalNames.at(i));
-    // }
 }
 
 void Theory::printFactOrigin(const string &name) {

@@ -31,7 +31,6 @@ public:
 
 private:
     string name;
-    //bool constant
 };
 
 
@@ -53,7 +52,7 @@ public:
     bool operator==(const Atomic &a) const {
         if (name != a.name)
             return false;
-        for (size_t i = 0; i < arity(); i++) { //assumes arity is the same
+        for (size_t i = 0; i < arity(); i++) {
             if (argAt(i) != a.argAt(i))
                 return false;
         }
@@ -186,6 +185,9 @@ public:
         premises = nf.premises;
         conclusion = nf.conclusion;
         universalVars = nf.universalVars;
+
+        usedFacts = nf.usedFacts;
+        replacements = nf.replacements;
     }
     NormFormula(const Conjunction &prem, const Atomic &conc) {
         premises = prem;
