@@ -308,14 +308,6 @@ bool Theory::equalsUniv(const NormFormula &lhs, const NormFormula &rhs) const {
     return true;
 }
 
-set<NormFormula>::iterator Theory::findFirst(const string &predicate) const {
-    Atomic conc(predicate);
-    NormFormula searchFor;
-    searchFor.setConclusion(conc);
-    return lower_bound(facts.begin(), facts.end(), searchFor);
-}
-
-
 void Theory::initNormalized() {
     for (auto it = initialAxioms.begin(); it != initialAxioms.end(); it++) {
         vector<NormFormula> normalized;
@@ -356,19 +348,28 @@ void Theory::saturate() {
             }
         }
     } while (updated);
+
+    saturateFacts(facts);
+}
+
+
+void Theory::saturateFacts(set<NormFormula> &fs) {
+    bool updated = false;
+    unsigned count = 0;
     do {
         updated = false;
         for(size_t i = 0; i < simpleImplications.size(); i++) {
             const NormFormula nf1 = simpleImplications.at(i);
             const string predicate = nf1.premiseAt(0).getName();
-            auto curr = findFirst(predicate);
-            while (curr != facts.end() && curr->getConclusion().getName() == predicate) {
+            auto curr = findFirst(fs, predicate);
+            while (curr != fs.end() && curr->getConclusion().getName() == predicate) {
                 NormFormula result;
                 if (canSaturate(nf1, *curr, result)) {
-                    bool exists = facts.find(result) != facts.end();
+                    bool exists = fs.find(result) != fs.end();
                     if (!exists) {
                         result.setName(curr->getName() + "sat" + to_string(count++));
-                        addFormula(result);
+                        fs.insert(result);
+                        addOrigin(result, nf1.getName());
                         updated=true;
                     }
                 }
@@ -386,7 +387,7 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
     if (a1.getName() != a2.getName())
         return false;
 
-    map<string, string> repl;
+    unordered_map<string, string> repl;
 
     for (size_t i = 0; i < a1.arity(); i++) {
         if (isConstant(a1.argAt(i))) {
@@ -407,7 +408,26 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
 
     result = nf2;
     result.setConclusion(replaced);
+    if (result.isFact()) {
+        result.addUsedFact(nf2.getName());
+        result.addReplacements(repl);
+    }
+
+    //todo add missing univ vars (if nf1 doesn't use some in premise)
     return true;
+}
+
+void Theory::addOrigin(NormFormula &nf, const string &stepName) {
+    Origin o(nf, stepName);
+    origins[nf.getName()] = o;
+    nf.clearOrigin();
+}
+
+set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate) {
+    Atomic conc(predicate);
+    NormFormula searchFor;
+    searchFor.setConclusion(conc);
+    return lower_bound(fs.begin(), fs.end(), searchFor);
 }
 
 

@@ -3,6 +3,39 @@
 
 #include "formula.h"
 
+class Origin {
+public:
+    Origin() {}
+    Origin(const NormFormula &nf, const string &stepName) {
+        formula = nf.getConclusion();
+        factsUsed = nf.getUsedFacts();
+        replacements = nf.getReplacements();
+        step = stepName;
+    }
+    const Atomic &getFormula() const { return formula; }
+    const string &getStep() const { return step; }
+
+    size_t numFacts() const { return factsUsed.size(); }
+    const string &factAt(size_t i) const { return factsUsed.at(i); }
+    void addFact(const string &s) {factsUsed.push_back(s); }
+
+    const unordered_map<string, string> &getReplacements() const {
+        return replacements;
+    }
+    void setReplacements(const unordered_map<string, string> &repl) {
+        replacements = repl;
+    }
+
+    bool isPrinted() const { return printed; }
+    void setPrinted(bool p) { printed = p; }
+
+    Atomic formula;
+    string step;
+    vector<string> factsUsed;
+    unordered_map<string, string> replacements;
+    bool printed = false;
+};
+
 class Theory
 {
     friend class Prover;
@@ -29,16 +62,18 @@ public:
     void updateSignature(const Formula &f);
 
     bool equalsUniv(const NormFormula &lhs, const NormFormula &rhs) const;
-    set<NormFormula>::iterator findFirst(const string &predicate) const;
 
     void initNormalized();
     void saturate();
+    void saturateFacts(set<NormFormula> &fs);
     bool canSaturate(const NormFormula &nf1, const NormFormula &nf2,
                      NormFormula &result) const;
 
-
     void printFormulas();
 
+    void addOrigin(NormFormula &nf, const string &stepName);
+
+private:
     vector<pair<Formula, string>> initialAxioms;
     pair<Formula, string> theorem;
     bool theoremAdded = false;
@@ -51,6 +86,9 @@ public:
     vector<pair<string, unsigned>> predicates;
     set<string> occuringPredicates;
 
+    unordered_map<string, Origin> origins;
 };
+
+set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate);
 
 #endif // THEORY_H

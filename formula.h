@@ -221,6 +221,22 @@ public:
     bool isFact() const;
     bool isSimpleImplication() const;
 
+    const vector<string> &getUsedFacts() const { return usedFacts; }
+    void addUsedFact(const string &f) { usedFacts.push_back(f); }
+
+    const unordered_map<string, string> &getReplacements() const { return replacements; }
+    void addReplacements(const unordered_map<string, string> &repl);
+
+    void copyOrigin(const NormFormula &nf) {
+        usedFacts = nf.usedFacts;
+        replacements = nf.replacements;
+    }
+
+    void clearOrigin() {
+        usedFacts.clear();
+        replacements.clear();
+    }
+
     bool operator<(const NormFormula &nf) const;
     friend ostream &operator<<(ostream &os, const NormFormula &f);
 private:
@@ -228,6 +244,9 @@ private:
     Conjunction premises;
     Atomic conclusion;
     vector<string> universalVars;
+
+    vector<string> usedFacts;
+    unordered_map<string, string> replacements;
 };
 
 

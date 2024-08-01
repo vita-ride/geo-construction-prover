@@ -1,6 +1,4 @@
 #include "prover.h"
-#include <unordered_map>
-#include <unordered_set>
 
 string findParent(unordered_map<string, string>& parent, string x) {
     if (!parent[x].empty()) {
@@ -43,19 +41,23 @@ bool Prover::prove() {
     }
 
     unsigned depth = 0;
+    // todo newPredicates = occuringPredicates
     do {
         if (!newFacts.empty()) {
-            saturateFacts(newFacts);
+            theory.saturateFacts(newFacts);
             for (auto it = newFacts.begin(); it != newFacts.end(); it++) {
                 theory.addFormula(*it);
                 if (goals.find(it->getConclusion()) != goals.end())
                     goals.erase(it->getConclusion());
             }
         }
+        // for (fact: newfacts) newPredicates.insert(fact)
         newFacts.clear();
         for (size_t i = 0; i < theory.complexAxioms.size(); i++) {
+            // if (any premise name in newPredicates)
             generateFacts(theory.complexAxioms.at(i), newFacts);
         }
+        // newPredicates.clear()
         depth++;
     } while (!goals.empty() && depth < 500 && !newFacts.empty());
 
@@ -102,7 +104,9 @@ void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earl
         }
         NormFormula searchFor;
         searchFor.setConclusion(a);
-        if (theory.facts.find(searchFor) != theory.facts.end()) {
+        auto it = theory.facts.find(searchFor);
+        if (it != theory.facts.end()) {
+            nf.addUsedFact(it->getName());
             nf.popPremiseBack();
         } else return;
     }
@@ -113,14 +117,15 @@ void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earl
                 newFacts.find(nf) != newFacts.end())
                 return;
         }
-
-        nf.setName(nf.getName() + "applied" + to_string(appliedCounter++));
+        string oldName = nf.getName();
+        nf.setName(oldName + "applied" + to_string(appliedCounter++));
         newFacts.insert(nf);
+        theory.addOrigin(nf, oldName);
         return;
     }
 
     const string predicate = nf.premiseBack().getName();
-    auto curr = theory.findFirst(predicate);
+    auto curr = findFirst(theory.facts, predicate);
 
     while (curr != theory.facts.end() && curr->getConclusion().getName() == predicate) {
         NormFormula merged;
@@ -153,8 +158,10 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
 
     // univ variables from premise matching with constants in conclusion
     unordered_map<string, string> replConst;
+
     // univ variables from conclusion matching with univ variables in premise
     unordered_map<string, unordered_set<string>> univToUniv;
+
     for (size_t i = 0; i < premise.arity(); i++) {
         if (theory.isConstant(premise.argAt(i))) continue;
         if (theory.isConstant(conc.argAt(i))) {
@@ -257,38 +264,12 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
     }
     merged.setPremises(mergedPremises);
     merged.setConclusion(mergedConclusion);
-    merged.setName(nf.getName());
     merged.setUnivVars(representatives);
-
+    merged.setName(nf.getName());
+    merged.copyOrigin(nf);
+    merged.addUsedFact(f.getName());
+    merged.addReplacements(repl);
     return true;
 }
 
-
-void Prover::saturateFacts(set<NormFormula> &facts) {
-    bool updated = false;
-    unsigned count = 0;
-    do {
-        updated = false;
-        for(size_t i = 0; i < theory.simpleImplications.size(); i++) {
-            const NormFormula nf1 = theory.simpleImplications.at(i);
-            const string predicate = nf1.premiseAt(0).getName();
-            Atomic conc(predicate);
-            NormFormula searchFor;
-            searchFor.setConclusion(conc);
-            auto curr = lower_bound(facts.begin(), facts.end(), searchFor);
-            while (curr != facts.end() && curr->getConclusion().getName() == predicate) {
-                NormFormula result;
-                if (theory.canSaturate(nf1, *curr, result)) {
-                    bool exists = facts.find(result) != facts.end();
-                    if (!exists) {
-                        result.setName(curr->getName() + "sat" + to_string(count++));
-                        facts.insert(result);
-                        updated=true;
-                    }
-                }
-                curr++;
-            }
-        }
-    } while (updated);
-}
 

@@ -517,6 +517,15 @@ bool NormFormula::isSimpleImplication() const {
     return numPremises() == 1;
 }
 
+void NormFormula::addReplacements(const unordered_map<string, string> &repl) {
+        for (auto it = replacements.begin(); it != replacements.end(); it++) {
+            if (repl.find(it->second) != repl.end())
+                it->second = repl.at(it->second);
+        }
+        for (auto it = repl.begin(); it != repl.end(); it++)
+            replacements.insert(*it);
+}
+
 bool NormFormula::operator<(const NormFormula &nf) const {
     // expected to be used when there are no premises
     if (conclusion.getName() < nf.conclusion.getName())
