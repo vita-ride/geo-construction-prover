@@ -409,7 +409,7 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
     result = nf2;
     result.setConclusion(replaced);
     if (result.isFact()) {
-        result.addUsedFact(nf2.getName());
+        result.addUsedFact(pair(nf2.getName(), nf2.getConclusion()));
         result.addReplacements(repl);
     }
 
@@ -430,6 +430,52 @@ set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &p
     return lower_bound(fs.begin(), fs.end(), searchFor);
 }
 
+
+void Theory::printProof() {
+    for (auto it = origins.begin(); it != origins.end(); it++) {
+        cout << it->first << endl;
+    }
+    // for (size_t i = 0; i < goalNames.size(); i++) {
+    //     printFactOrigin(goalNames.at(i));
+    // }
+}
+
+void Theory::printFactOrigin(const string &name) {
+    auto found = origins.find(name);
+    if (found == origins.end())
+        return;
+    Origin &origin = found->second;
+    if (origin.isPrinted())
+        return;
+
+    for (size_t i = 0; i < origin.numFacts(); i++) {
+        printFactOrigin(origin.factAt(i).first);
+    }
+
+    if (origin.numFacts() > 0) {
+        cout << origin.getFormula() << " (from ";
+        for (size_t i = 0; i < origin.numFacts(); i++) {
+            cout << origin.factAt(i).second;
+            if (i < origin.numFacts() - 1)
+                cout << ", ";
+        }
+
+        cout << " using " << origin.getStep();
+
+        if (!origin.getReplacements().empty()) {
+            cout << "; instantiation: ";
+            for (auto it = origin.getReplacements().begin();
+                 it != origin.getReplacements().end(); it++) {
+                cout << it->first << "->" << it->second;
+                if (next(it) != origin.getReplacements().end())
+                    cout << ", ";
+            }
+        }
+        cout << ")" << endl;
+    }
+
+    origin.setPrinted(true);
+}
 
 void Theory::printFormulas() {
     cout << "\tFacts:" << endl;

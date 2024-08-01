@@ -221,8 +221,8 @@ public:
     bool isFact() const;
     bool isSimpleImplication() const;
 
-    const vector<string> &getUsedFacts() const { return usedFacts; }
-    void addUsedFact(const string &f) { usedFacts.push_back(f); }
+    const vector<pair<string, Atomic>> &getUsedFacts() const { return usedFacts; }
+    void addUsedFact(const pair<string, Atomic> &f) { usedFacts.push_back(f); }
 
     const unordered_map<string, string> &getReplacements() const { return replacements; }
     void addReplacements(const unordered_map<string, string> &repl);
@@ -245,7 +245,7 @@ private:
     Atomic conclusion;
     vector<string> universalVars;
 
-    vector<string> usedFacts;
+    vector<pair<string, Atomic>> usedFacts;
     unordered_map<string, string> replacements;
 };
 

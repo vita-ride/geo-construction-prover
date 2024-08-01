@@ -16,8 +16,8 @@ public:
     const string &getStep() const { return step; }
 
     size_t numFacts() const { return factsUsed.size(); }
-    const string &factAt(size_t i) const { return factsUsed.at(i); }
-    void addFact(const string &s) {factsUsed.push_back(s); }
+    const pair<string, Atomic> &factAt(size_t i) const { return factsUsed.at(i); }
+    void addFact(const pair<string, Atomic> &f) { factsUsed.push_back(f); }
 
     const unordered_map<string, string> &getReplacements() const {
         return replacements;
@@ -31,7 +31,7 @@ public:
 
     Atomic formula;
     string step;
-    vector<string> factsUsed;
+    vector<pair<string, Atomic>> factsUsed;
     unordered_map<string, string> replacements;
     bool printed = false;
 };
@@ -72,6 +72,10 @@ public:
     void printFormulas();
 
     void addOrigin(NormFormula &nf, const string &stepName);
+    void addGoalName(const string &name) { goalNames.push_back(name); }
+
+    void printProof();
+    void printFactOrigin(const string &name);
 
 private:
     vector<pair<Formula, string>> initialAxioms;
@@ -87,6 +91,7 @@ private:
     set<string> occuringPredicates;
 
     unordered_map<string, Origin> origins;
+    vector<string> goalNames;
 };
 
 set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate);

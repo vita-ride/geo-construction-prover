@@ -17,7 +17,7 @@ void Prover::initAxioms() {
     theory.saturate();
 }
 
-bool Prover::prove() {
+void Prover::prove() {
     cout << "Theorem to prove:" << endl << "\t" << theory.getTheorem().second
          << ": " << theory.getTheorem().first << endl
          << "Assumptions:" << endl;
@@ -37,7 +37,7 @@ bool Prover::prove() {
     cout << "It should be proved that:" << endl;
     for (size_t i = 0; i < theorem.numConclusions(); i++) {
         cout << "\t" << theorem.conclusionAt(i) << endl;
-        goals.insert(theorem.premiseAt(i));
+        goals.insert(theorem.conclusionAt(i));
     }
 
     unsigned depth = 0;
@@ -47,8 +47,11 @@ bool Prover::prove() {
             theory.saturateFacts(newFacts);
             for (auto it = newFacts.begin(); it != newFacts.end(); it++) {
                 theory.addFormula(*it);
-                if (goals.find(it->getConclusion()) != goals.end())
+                if (goals.find(it->getConclusion()) != goals.end()) {
                     goals.erase(it->getConclusion());
+                    theory.addGoalName(it->getName());
+                    cout << "Goal name: " << it->getName() << endl;
+                }
             }
         }
         // for (fact: newfacts) newPredicates.insert(fact)
@@ -63,13 +66,11 @@ bool Prover::prove() {
 
     if (goals.empty()) {
         cout << "Proof successful!" << endl;
-        return true;
+        theory.printProof();
+    } else {
+        cout << "Proof failed" << endl;
+        theory.printFormulas();
     }
-
-    cout << "Proof failed" << endl;
-    theory.printFormulas();
-    return false;
-
 }
 
 void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earlyChecked) {
@@ -106,7 +107,7 @@ void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earl
         searchFor.setConclusion(a);
         auto it = theory.facts.find(searchFor);
         if (it != theory.facts.end()) {
-            nf.addUsedFact(it->getName());
+            nf.addUsedFact(pair(it->getName(), it->getConclusion()));
             nf.popPremiseBack();
         } else return;
     }
@@ -267,7 +268,7 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
     merged.setUnivVars(representatives);
     merged.setName(nf.getName());
     merged.copyOrigin(nf);
-    merged.addUsedFact(f.getName());
+    merged.addUsedFact(pair(f.getName(), f.getConclusion()));
     merged.addReplacements(repl);
     return true;
 }

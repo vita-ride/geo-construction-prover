@@ -11,7 +11,7 @@ public:
     }
 
     void initAxioms();
-    bool prove();
+    void prove();
     void generateFacts(NormFormula nf, set<NormFormula> &newFacts,
                        bool earlyChecked = false);
     bool canMerge(const NormFormula &nf, const NormFormula &f,
