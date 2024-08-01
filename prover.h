@@ -16,6 +16,7 @@ public:
                        bool earlyChecked = false);
     bool canMerge(const NormFormula &nf, const NormFormula &f,
                   NormFormula &merged);
+    void saturateFacts(set<NormFormula> &facts);
 
     Theory theory;
     set<Atomic> goals;

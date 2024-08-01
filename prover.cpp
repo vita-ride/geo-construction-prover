@@ -11,14 +11,22 @@ string findParent(unordered_map<string, string>& parent, string x) {
 
 void Prover::initAxioms() {
     theory.initNormalized();
+
+    theory.addEqSymAxiom();
+    theory.addNEqSymAxiom();
+    theory.addEqSubAxioms();
+
     theory.saturate();
 }
 
 bool Prover::prove() {
     cout << "Theorem to prove:" << endl << "\t" << theory.getTheorem().second
-         << ": " << theory.getTheorem().first << endl << endl
+         << ": " << theory.getTheorem().first << endl
          << "Assumptions:" << endl;
+
     Formula theorem = theory.getTheorem().first;
+    set<NormFormula> newFacts;
+
     for (size_t i = 0; i < theorem.numPremises(); i++) {
         Atomic a = theorem.premiseAt(i);
         NormFormula nf;
@@ -26,39 +34,40 @@ bool Prover::prove() {
         nf.setName("theorem_assume" + to_string(i));
 
         cout << "\t" << a << endl;
-        theory.addFormula(nf);
+        newFacts.insert(nf);
     }
     cout << "It should be proved that:" << endl;
     for (size_t i = 0; i < theorem.numConclusions(); i++) {
         cout << "\t" << theorem.conclusionAt(i) << endl;
         goals.insert(theorem.premiseAt(i));
     }
-    bool updated = false;
+
     unsigned depth = 0;
     do {
-        updated = false;
-        set<NormFormula> newFacts;
-        for (size_t i = 0; i < theory.complexAxioms.size(); i++) {
-            generateFacts(theory.complexAxioms.at(i), newFacts);
-        }
         if (!newFacts.empty()) {
-            updated = true;
-            // todo saturate newfacts
+            saturateFacts(newFacts);
             for (auto it = newFacts.begin(); it != newFacts.end(); it++) {
                 theory.addFormula(*it);
                 if (goals.find(it->getConclusion()) != goals.end())
                     goals.erase(it->getConclusion());
             }
         }
+        newFacts.clear();
+        for (size_t i = 0; i < theory.complexAxioms.size(); i++) {
+            generateFacts(theory.complexAxioms.at(i), newFacts);
+        }
         depth++;
-    } while (!goals.empty() && depth < 500 && updated);
+    } while (!goals.empty() && depth < 500 && !newFacts.empty());
 
     if (goals.empty()) {
         cout << "Proof successful!" << endl;
-    } else {
-        cout << "Proof failed" << endl;
-        theory.printFormulas();
+        return true;
     }
+
+    cout << "Proof failed" << endl;
+    theory.printFormulas();
+    return false;
+
 }
 
 void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts, bool earlyChecked) {
@@ -246,14 +255,40 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
             mergedConclusion.setArg(i, repl[mergedConclusion.argAt(i).getName()]);
         }
     }
-
     merged.setPremises(mergedPremises);
     merged.setConclusion(mergedConclusion);
+    merged.setName(nf.getName());
     merged.setUnivVars(representatives);
 
     return true;
 }
 
 
-
+void Prover::saturateFacts(set<NormFormula> &facts) {
+    bool updated = false;
+    unsigned count = 0;
+    do {
+        updated = false;
+        for(size_t i = 0; i < theory.simpleImplications.size(); i++) {
+            const NormFormula nf1 = theory.simpleImplications.at(i);
+            const string predicate = nf1.premiseAt(0).getName();
+            Atomic conc(predicate);
+            NormFormula searchFor;
+            searchFor.setConclusion(conc);
+            auto curr = lower_bound(facts.begin(), facts.end(), searchFor);
+            while (curr != facts.end() && curr->getConclusion().getName() == predicate) {
+                NormFormula result;
+                if (theory.canSaturate(nf1, *curr, result)) {
+                    bool exists = facts.find(result) != facts.end();
+                    if (!exists) {
+                        result.setName(curr->getName() + "sat" + to_string(count++));
+                        facts.insert(result);
+                        updated=true;
+                    }
+                }
+                curr++;
+            }
+        }
+    } while (updated);
+}
 

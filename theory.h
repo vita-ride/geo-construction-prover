@@ -7,7 +7,10 @@ class Theory
 {
     friend class Prover;
 public:
-    Theory() {}
+    Theory() {
+        addPredicate(sBOT, 0);
+        addPredicate(sTOP, 0);
+    }
 
     bool readTPTP(const string inputFile);
 
@@ -16,9 +19,14 @@ public:
     const pair<Formula, string> &getTheorem() const { return theorem; }
     void addFormula(const NormFormula &formula);
 
+    void addEqSymAxiom();
+    void addNEqSymAxiom();
+    void addEqSubAxioms();
+
     void addConstant(string s);
     bool isConstant(Term t) const;
     void addPredicate(const string &name, unsigned arity);
+    void updateSignature(const Formula &f);
 
     bool equalsUniv(const NormFormula &lhs, const NormFormula &rhs) const;
     set<NormFormula>::iterator findFirst(const string &predicate) const;

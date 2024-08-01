@@ -84,6 +84,7 @@ public:
 
     Term argAt(size_t i) const { return args.at(i); }
     void setArg(size_t i, const string &arg) { args[i].setName(arg); }
+    void addArg(const Term &t) { args.push_back(t); }
     size_t arity() const { return args.size(); }
 
     void clear() {
@@ -267,13 +268,13 @@ inline ostream &operator<<(ostream &os, const Atomic &a) {
 }
 
 inline ostream &operator<<(ostream &os, const Conjunction &c) {
-    os << "(";
+    if (c.size() > 1) os << "(";
     for (size_t i = 0; i < c.size(); i++) {
         os << c.at(i);
         if (i != c.size() - 1)
             os << " & ";
     }
-    os << ")";
+    if (c.size() > 1) os << ")";
     return os;
 }
 
