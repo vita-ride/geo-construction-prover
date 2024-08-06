@@ -30,6 +30,12 @@ fof(distinct_ABC, axiom, pA != pB & pA != pC & pB != pC).
 fof(inc_A_C_ac, axiom, inc(pA, ac) & inc(pC, ac)).
 fof(inc_B_C_bc, axiom, inc(pB, bc) & inc(pC, bc)).
 fof(inc_A_B_ab, axiom, inc(pA, ab) & inc(pB, ab)).
+fof(perp_ha_BC, axiom, perp(ha, bc) & inc(pA, ha)).
+fof(perp_hb_AC, axiom, perp(hb, ac) & inc(pB, hb)).
+fof(perp_hc_AB, axiom, perp(hc, ab) & inc(pC, hc)).
+fof(inc_Ha_ha, axiom, inc(pHa, ha) & inc(pHa, bc)).
+fof(inc_Hb_hb, axiom, inc(pHb, hb) & inc(pHb, ac)).
+fof(inc_Hc_hc, axiom, inc(pHc, hc) & inc(pHc, ab)).
 fof(pMa_def, axiom, midpoint(pMa, pB, pC)).
 fof(pMb_def, axiom, midpoint(pMb, pA, pC)).
 fof(pMc_def, axiom, midpoint(pMc, pA, pB)).
@@ -44,6 +50,12 @@ fof(perp_bisc_ab, axiom, perp(bisc, ab)).
 fof(inc_Oc_bisa, axiom, inc(pOc, bisa)).
 fof(inc_Oc_bisb, axiom, inc(pOc, bisb)).
 fof(inc_Oc_bisc, axiom, inc(pOc, bisc)).
+fof(inc_Hb_cBC, axiom, inc_c(pHb, cobc)).
+fof(inc_Hc_cBC, axiom, inc_c(pHc, cobc)).
+fof(inc_Ha_cAC, axiom, inc_c(pHa, coac)).
+fof(inc_Hc_cAC, axiom, inc_c(pHc, coac)).
+fof(inc_Ha_cAB, axiom, inc_c(pHa, coab)).
+fof(inc_Hb_cAB, axiom, inc_c(pHb, coab)).
 fof(ratio23_AGAMa, axiom, ratio23(pA, pG, pA, pMa)).
 fof(ratio23_BGBMb, axiom, ratio23(pB, pG, pB, pMb)).
 fof(ratio23_CGCMc, axiom, ratio23(pC, pG, pC, pMc)).
@@ -90,8 +102,26 @@ fof(ac_unique, axiom, ![L] : (inc(pA, L) & inc(pC, L) => L = ac)).
 fof(bc_unique, axiom, ![L] : (inc(pB, L) & inc(pC, L) => L = bc)).
 fof(sides_distinct, axiom, ab != ac & ab != bc & ac != bc).
 fof(altitudes_non_sides, axiom, ha != bc & hb != ac & hc != ab).
+fof(pAHa, axiom, ![P] : (pA != pHa & line(pA, pHa, P) => P = ha)).
+fof(pBHb, axiom, ![P] : (pB != pHb & line(pB, pHb, P) => P = hb)).
+fof(pCHc, axiom, ![P] : (pC != pHc & line(pC, pHc, P) => P = hc)).
+fof(haA, axiom, ![H] : (perp(H, bc) & inc(pA, H) => ha = H)).
+fof(hbB, axiom, ![H] : (perp(H, ac) & inc(pB, H) => hb = H)).
+fof(hcC, axiom, ![H] : (perp(H, ab) & inc(pC, H) => hc = H)).
+fof(haHa, axiom, ![H] : (perp(H, bc) & inc(pHa, H) => ha = H)).
+fof(hbHb, axiom, ![H] : (perp(H, ac) & inc(pHb, H) => hb = H)).
+fof(hcHc, axiom, ![H] : (perp(H, ab) & inc(pHc, H) => hc = H)).
 fof(circle_over_sym1, axiom, ![P1, P2, K1, K2] : (P1 != P2 & circle_over(K1, P1, P2) & circle_over(K2, P1, P2) => K1 = K2)).
 fof(circle_over_sym2, axiom, ![P1, P2, K1] : (P1 != P2 & circle_over(K1, P1, P2) => circle_over(K1, P2, P1)).
+fof(pHa_def, axiom, ![H1] : (inc(H1, ha) & inc(H1, bc) => H1 = pHa)).
+fof(pHb_def, axiom, ![H1] : (inc(H1, hb) & inc(H1, ac) => H1 = pHb)).
+fof(pHc_def, axiom, ![H1] : (inc(H1, hc) & inc(H1, ab) => H1 = pHc)).
+fof(line_BHa, axiom, ![P, Q] : (pB != pHa & line(pB, pHa, P) & line(pB, pC, Q) => P = Q)).
+fof(line_CHa, axiom, ![P, Q] : (pC != pHa & line(pC, pHa, P) & line(pB, pC, Q) => P = Q)).
+fof(line_AHb, axiom, ![P, Q] : (pA != pHb & line(pA, pHb, P) & line(pA, pC, Q) => P = Q)).
+fof(line_CHb, axiom, ![P, Q] : (pC != pHb & line(pC, pHb, P) & line(pA, pC, Q) => P = Q)).
+fof(line_AHc, axiom, ![P, Q] : (pA != pHc & line(pA, pHc, P) & line(pA, pB, Q) => P = Q)).
+fof(line_BHc, axiom, ![P, Q] : (pB != pHc & line(pB, pHc, P) & line(pA, pB, Q) => P = Q)).
 fof(cc_unique, axiom, ![C] : (inc_c(pA, C) & inc_c(pB, C) & inc_c(pC, C) => C = cc)).
 fof(oc_unique, axiom, ![C] : (inc_c(pA, C) & inc_c(pB, C) & inc_c(pC, C) & center(pO1, C) => pO1 = pOc)).
 fof(inc_midpoint, axiom, ![X, Y, M, L] : (X != Y & midpoint(M, X, Y) & line(X, Y, L) => inc(M, L))).
@@ -103,26 +133,16 @@ fof(bisectors_not_sides, axiom, ab != bisc & ac != bisb & bc != bisa).
 fof(pMa_is_intersect_bisa_bc, axiom, ![P] : (inc(P, bc) & inc(P, bisa) => P = pMa)).
 fof(pMc_is_intersect_bisc_ab, axiom, ![P] : (inc(P, ab) & inc(P, bisc) => P = pMc)).
 fof(pMb_is_intersect_bisb_ac, axiom, ![P] : (inc(P, ac) & inc(P, bisb) => P = pMb)).
+fof(ratio21_para, axiom, ![A, G, Ma, H, Oc, Lba, Lha] : (ratio21(A, G, G, Ma) & ratio21(H, G, G, Oc) & line(Oc, Ma, Lba) & line(A, H, Lha) => para(Lba, Lha))).
 fof(perp_para, axiom, ![Lba, Lha, A] : (perp(Lha, A) & para(Lba, Lha) => perp(Lba, A))).
+fof(pH_def, axiom, inc(pH, ha) & inc(pH, hb) & inc(pH, hc)).
+fof(pH_unique1, axiom, ![H1] : (inc(H1, ha) & inc(H1, hb) => H1 = pH)).
+fof(pH_unique2, axiom, ![H1] : (inc(H1, ha) & inc(H1, hc) => H1 = pH)).
+fof(pH_unique3, axiom, ![H1] : (inc(H1, hb) & inc(H1, hc) => H1 = pH)).
 
-% CONJECTURES
-
-%-----------------------
-% lemma: A_Ma_Mb:
-%-----------------------
-%fof(th_A_Ma_Mb, conjecture, midpoint(pMa1, pB, pC) & midpoint(pMb1, pA, pC) => pMa = pMa1 & pMb = pMb1).
-
-%-----------------------
-% lemma: A_Mb_G:
-%-----------------------
-%fof(th_A_Mb_G1, conjecture, midpoint(pMb1, pA, pC) & ratio23(pB, pG1, pB, pMb1) => pMb = pMb1 & pG = pG1).
+% CONJECTURE
 
 %-----------------------
-% lemma: A_O_Ma:
+% lemma: A_O_Hb:
 %-----------------------
-%fof(th_A_O_Ma, conjecture, (inc(pO1, ma1) & inc(pMa1, ma1) & inc(pMa1, a1) & perp(a1, ma1) & center(pO1, k) & inc_c(pA, k) & inc(pB, a1) & inc_c(pB, k) & inc(pC, a1) & inc_c(pC, k) => pO1 = pOc & pMa = pMa1)).
-
-%-----------------------
-% lemma: A_Mb_Mc:
-%-----------------------
-fof(th_A_Mb_Mc, conjecture, (midpoint(pMb1, pA, pC) & midpoint(pMc1, pA, pB) => pMb = pMb1 & pMc = pMc1)).
+fof(th_A_O_Hb, conjecture, (inc(pA, b1) & inc(pHb1, b1) & inc_c(pA, k) & center(pO1, k) & inc_c(pC, k) & inc(pC, b1) & inc(pHb1, hb1) & perp(hb1, b1) & inc_c(pB, k) & inc(pB, hb1) => pHb = pHb1 & pO1 = pOc)).
