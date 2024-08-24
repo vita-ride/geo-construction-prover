@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <string>
+#include <sstream>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -9,6 +10,8 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+
+#define MAX_SEARCH_DEPTH 500
 
 using namespace std;
 

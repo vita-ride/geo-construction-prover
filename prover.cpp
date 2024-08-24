@@ -12,7 +12,9 @@ void Prover::initAxioms() {
 
     theory.addEqSymAxiom();
     theory.addNEqSymAxiom();
+    theory.addEqReflAxiom();
     theory.addEqSubAxioms();
+    theory.addNegAxioms();
 
     theory.saturate();
 }
@@ -41,11 +43,17 @@ void Prover::prove() {
     }
 
     unsigned depth = 0;
+    bool contradiction = false;
     do {
         if (!newFacts.empty()) {
             theory.saturateFacts(newFacts);
             for (auto it = newFacts.begin(); it != newFacts.end(); it++) {
                 theory.addFormula(*it);
+                if (it->getConclusion().getName() == sBOT) {
+                    contradiction = true;
+                    theory.setContradictionName(it->getName());
+                    break;
+                }
                 if (goals.find(it->getConclusion()) != goals.end()) {
                     goals.erase(it->getConclusion());
                     theory.addGoalName(it->getName());
@@ -53,18 +61,26 @@ void Prover::prove() {
             }
         }
         newFacts.clear();
-        for (size_t i = 0; i < theory.complexAxioms.size(); i++) {
-            generateFacts(theory.complexAxioms.at(i), newFacts);
-        }
+        if (!contradiction)
+            for (size_t i = 0; i < theory.complexAxioms.size(); i++) {
+                generateFacts(theory.complexAxioms.at(i), newFacts);
+            }
         depth++;
-    } while (!goals.empty() && depth < 500 && !newFacts.empty());
+    } while (!goals.empty() && depth < MAX_SEARCH_DEPTH && !newFacts.empty() && !contradiction);
 
     if (goals.empty()) {
         cout << "Proof successful!" << endl;
         theory.printProof();
     } else {
-        cout << "Proof failed" << endl;
-        theory.printFormulas();
+        cout << "Proof failed: ";
+        if (contradiction) {
+            cout << "arrived at contradiction:" << endl;
+            theory.printProof(true);
+        } else if (depth >= MAX_SEARCH_DEPTH) {
+            cout << "maximum depth exceeded." << endl;
+        } else {
+            cout << "reached fixed point." << endl;
+        }
     }
 }
 
@@ -103,9 +119,9 @@ void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts,
         searchFor.setConclusion(a);
         auto it = theory.facts.find(searchFor);
         if (it != theory.facts.end()) {
-            nf.addUsedFact(pair(it->getName(), it->getConclusion()));
+            nf.addUsedFact(pair(it->getName(), it->simpleString()));
             nf.popPremiseBack();
-        } else return;
+        } else break;
     }
 
     if (nf.numPremises() == 0) {
@@ -269,7 +285,7 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
     merged.setUnivVars(representatives);
     merged.setName(nf.getName());
     merged.copyOrigin(nf);
-    merged.addUsedFact(pair(f.getName(), f.getConclusion()));
+    merged.addUsedFact(pair(f.getName(), f.simpleString()));
     merged.addReplacements(repl);
 
     return true;

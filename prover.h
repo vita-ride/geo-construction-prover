@@ -6,9 +6,7 @@
 class Prover
 {
 public:
-    Prover(const Theory &t) {
-        theory = t;
-    }
+    Prover(Theory &t): theory(t) {}
 
     void initAxioms();
     void prove();
@@ -17,7 +15,7 @@ public:
     bool canMerge(const NormFormula &nf, const NormFormula &f,
                   NormFormula &merged);
 
-    Theory theory;
+    Theory &theory;
     set<Atomic> goals;
 
     unsigned appliedCounter = 0;
