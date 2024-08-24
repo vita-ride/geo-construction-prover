@@ -14,6 +14,7 @@ int main(int argc, char **argv)
 
         Prover p(t);
         p.initAxioms();
+        t.printFormulas();
         p.prove();
     }
 }

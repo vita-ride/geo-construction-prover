@@ -174,6 +174,22 @@ void Theory::addNEqSymAxiom() {
     addFormula(axiom);
 }
 
+void Theory::addEqReflAxiom() {
+    if (occuringPredicates.find(EQ_NATIVE_NAME) == occuringPredicates.end())
+        return;
+    Conjunction premises;
+    Atomic conclusion;
+    Term ta("A");
+    conclusion.setName(EQ_NATIVE_NAME);
+    conclusion.addArg(ta);
+    conclusion.addArg(ta);
+
+    NormFormula axiom(premises, conclusion);
+    axiom.addUnivVar("A");
+    axiom.setName("eq_refl");
+    addFormula(axiom);
+}
+
 void Theory::addEqSubAxioms() {
     if (occuringPredicates.find(EQ_NATIVE_NAME) == occuringPredicates.end())
         return;
@@ -210,6 +226,35 @@ void Theory::addEqSubAxioms() {
     }
 }
 
+void Theory::addNegAxioms() {
+    for (size_t i = 2; i < predicates.size(); i+=2) {
+        if (occuringPredicates.find(PREFIX_NEGATED + predicates[i].first)
+                == occuringPredicates.end() ||
+            occuringPredicates.find(predicates[i].first) == occuringPredicates.end())
+            continue;
+
+        Conjunction premises;
+        Atomic premise, conclusion;
+
+        for (size_t j = 0; j < predicates[i].second; j++) {
+            Term t(string(1, 'A'+j));
+            premise.addArg(t);
+        }
+
+        premise.setName(predicates[i].first);
+        premises.add(premise);
+        premise.setName(predicates[i+1].first);
+        premises.add(premise);
+        conclusion.setName(sBOT);
+
+        NormFormula axiom(premises, conclusion);
+        for (size_t j = 0; j < predicates[i].second; j++) {
+            axiom.addUnivVar(string(1, 'A'+j));
+        }
+        axiom.setName(predicates[i].first + "Neg");
+        addFormula(axiom);
+    }
+}
 
 void Theory::addConstant(string s) {
     if (s != "_")
@@ -366,6 +411,8 @@ void Theory::saturateFacts(set<NormFormula> &fs) {
                 NormFormula result;
                 if (canSaturate(nf1, *curr, result)) {
                     bool exists = fs.find(result) != fs.end();
+                    if (!exists && &fs != &facts)
+                        exists = facts.find(result) != facts.end();
                     if (!exists) {
                         result.setName(curr->getName() + "sat" + to_string(count++));
                         fs.insert(result);
@@ -409,7 +456,7 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
     result = nf2;
     result.setConclusion(replaced);
     if (result.isFact()) {
-        result.addUsedFact(pair(nf2.getName(), nf2.getConclusion()));
+        result.addUsedFact(pair(nf2.getName(), nf2.simpleString()));
         result.addReplacements(repl);
     }
 
@@ -431,9 +478,13 @@ set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &p
 }
 
 
-void Theory::printProof() {
-    for (size_t i = 0; i < goalNames.size(); i++) {
-        printFactOrigin(goalNames.at(i));
+void Theory::printProof(bool isContradiction) {
+    if (isContradiction) {
+        printFactOrigin(contradictionName);
+    } else {
+        for (size_t i = 0; i < goalNames.size(); i++) {
+            printFactOrigin(goalNames.at(i));
+        }
     }
 }
 
@@ -478,19 +529,19 @@ void Theory::printFormulas() {
     cout << "\tFacts:" << endl;
     size_t counter = 0;
     for (auto it = facts.begin(); it != facts.end(); it++) {
-        cout << "\t\tFact " << counter++ << ": " << it->getName()
-             << ":" << endl << "\t\t\t\t" << *it << endl;
+        cout << "\t\t" << counter++ << ". " << it->getName()
+             << ":" << endl << "\t\t\t---- " << *it << endl;
     }
     cout << "\tSimple implications:" << endl;
     for (size_t i = 0; i < simpleImplications.size(); i++) {
-        cout << "\t\tImplication " << i << ": "
+        cout << "\t\t" << i << ". "
              << simpleImplications.at(i).getName() << ":" << endl
-             << "\t\t\t\t" << simpleImplications.at(i) << endl;
+             << "\t\t\t---- " << simpleImplications.at(i) << endl;
     }
     cout << "\tComplex axioms:" << endl;
     for (size_t i = 0; i < complexAxioms.size(); i++) {
-        cout << "\t\tAxiom " << i << ": "
+        cout << "\t\t" << i << ". "
              << complexAxioms.at(i).getName() << ":" << endl
-             << "\t\t\t\t" << complexAxioms.at(i) << endl;
+             << "\t\t\t---- " << complexAxioms.at(i) << endl;
     }
 }

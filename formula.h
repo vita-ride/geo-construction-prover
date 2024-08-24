@@ -223,8 +223,10 @@ public:
     bool isFact() const;
     bool isSimpleImplication() const;
 
-    const vector<pair<string, Atomic>> &getUsedFacts() const { return usedFacts; }
-    void addUsedFact(const pair<string, Atomic> &f) { usedFacts.push_back(f); }
+    string simpleString() const;
+
+    const vector<pair<string, string>> &getUsedFacts() const { return usedFacts; }
+    void addUsedFact(const pair<string, string> &f) { usedFacts.push_back(f); }
 
     const unordered_map<string, string> &getReplacements() const { return replacements; }
     void addReplacements(const unordered_map<string, string> &repl);
@@ -238,7 +240,6 @@ public:
         usedFacts.clear();
         replacements.clear();
     }
-
     bool operator<(const NormFormula &nf) const;
     friend ostream &operator<<(ostream &os, const NormFormula &f);
 private:
@@ -247,7 +248,7 @@ private:
     Atomic conclusion;
     vector<string> universalVars;
 
-    vector<pair<string, Atomic>> usedFacts;
+    vector<pair<string, string>> usedFacts;
     unordered_map<string, string> replacements;
 };
 

@@ -572,3 +572,12 @@ bool NormFormula::operator<(const NormFormula &nf) const {
     return false;
 }
 
+string NormFormula::simpleString() const {
+    stringstream ss;
+    if (numUnivVars() > 0)
+        ss << *this;
+    else
+        ss << getConclusion();
+    return ss.str();
+}
+

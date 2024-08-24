@@ -16,8 +16,8 @@ public:
     const string &getStep() const { return step; }
 
     size_t numFacts() const { return factsUsed.size(); }
-    const pair<string, Atomic> &factAt(size_t i) const { return factsUsed.at(i); }
-    void addFact(const pair<string, Atomic> &f) { factsUsed.push_back(f); }
+    const pair<string, string> &factAt(size_t i) const { return factsUsed.at(i); }
+    void addFact(const pair<string, string> &f) { factsUsed.push_back(f); }
 
     const unordered_map<string, string> &getReplacements() const {
         return replacements;
@@ -31,7 +31,7 @@ public:
 
     Atomic formula;
     string step;
-    vector<pair<string, Atomic>> factsUsed;
+    vector<pair<string, string>> factsUsed;
     unordered_map<string, string> replacements;
     bool printed = false;
 };
@@ -54,7 +54,9 @@ public:
 
     void addEqSymAxiom();
     void addNEqSymAxiom();
+    void addEqReflAxiom();
     void addEqSubAxioms();
+    void addNegAxioms();
 
     void addConstant(string s);
     bool isConstant(Term t) const;
@@ -74,7 +76,9 @@ public:
     void addOrigin(NormFormula &nf, const string &stepName);
     void addGoalName(const string &name) { goalNames.push_back(name); }
 
-    void printProof();
+    void setContradictionName(const string &name) { contradictionName = name; }
+
+    void printProof(bool isContradiction = false);
     void printFactOrigin(const string &name);
 
 private:
@@ -92,6 +96,7 @@ private:
 
     unordered_map<string, Origin> origins;
     vector<string> goalNames;
+    string contradictionName;
 };
 
 set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate);
