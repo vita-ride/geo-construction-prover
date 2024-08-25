@@ -460,7 +460,6 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
         result.addReplacements(repl);
     }
 
-    //todo add missing univ vars (if nf1 doesn't use some in premise)
     return true;
 }
 
