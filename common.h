@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#define MAX_SEARCH_DEPTH 500
+#define MAX_SEARCH_DEPTH 100
 
 using namespace std;
 

@@ -57,26 +57,43 @@ fof(pH_unique3,axiom, ! [H1] : (inc(H1,hb) & (inc(H1,hc)) => H1 = pH ) ).
 %-----------------------
 %fof(th_A_B_Ma,conjecture, ( ( midpoint(pMa1,pB,pC) ) => ( pMa=pMa1 ) ) ).
 
-
 %-----------------------
 %lemma 6: A_B_G:
 %-----------------------
 %fof(th_A_B_G,conjecture, (ratio23(pB,pG1,pB,pMb1) & midpoint(pMb1,pA,pC) => ( pG=pG1 ) ) ).
-
 
 %-----------------------
 %lemma 10: A_B_H:
 %-----------------------
 %fof(th_A_B_H,conjecture, ( ( inc(pA,ha1) & inc(pH1,ha1) & inc(pB,hb1) & inc(pH1,hb1) & inc(pB,a1) & perp(a1,ha1) & inc(pA,b1) & perp(b1,hb1) & inc(pC,a1) & inc(pC,b1) ) => ( pH1=pH ) ) ).
 
-
 %-----------------------
 %lemma 32: A_Ha_O:
 %-----------------------
 %fof(th_A_Ha_O,conjecture, ( ( inc(pA,ha1) & inc(pHa1,ha1) & perp(ha1,a1) & inc(pHa1,a1) & inc_c(pA,k) & center(pO1,k) & inc_c(pB,k) & inc(pB,a1) & inc_c(pC,k) & inc(pC,a1) ) => ( pHa=pHa1 &  pOc=pO1 ) ) ).
 
-
 %-----------------------
 %lemma 342: Ma_Mb_G:
 %-----------------------
-fof(th_Ma_Mb_G,conjecture, (midpoint(pMa1,pB,pC) & ratio23(pA,pG1,pA,pMa1) & ratio23(pB,pG1,pB,pMb1) => ( pMa=pMa1 & pMb=pMb1 & pG=pG1 ) ) ).
+%fof(th_Ma_Mb_G,conjecture, (midpoint(pMa1,pB,pC) & ratio23(pA,pG1,pA,pMa1) & ratio23(pB,pG1,pB,pMb1) => ( pMa=pMa1 & pMb=pMb1 & pG=pG1 ) ) ).
+
+%-----------------------
+%lemma 56: A_Mb_H:
+%-----------------------
+%fof(th_A_Mb_H,conjecture, ( ( inc(pA,b) & inc(pMb1,b) & midpoint(pMb1,pA,pC) & inc(pA,ha1) & inc(pH1,ha1) & inc(pC,hc1) & inc(pH1,hc1) & inc(pC,a1) & perp(a1,ha1) & inc(pA,c1) & perp(c1,hc1) & inc(pB,a1) & inc(pB,c1) ) => ( pMb=pMb1 & pH=pH1) ) ).
+
+%-----------------------
+% lemma: A_Ha_Hb:
+%-----------------------
+%fof(th_A_Ha_Hb, conjecture, (inc(pA, ha1) & inc(pHa1, ha1) & inc(pA, b1) & inc(pHb1, b1) & perp(ha1, a1) & inc(pHa1, a1) & inc(pC, a1) & inc(pC, b1) & inc(pHb1, hb1) & perp(b1, hb1) & inc(pB, a1) & inc(pB, hb1) => pHa = pHa1 & pHb = pHb1)).
+
+%-----------------------
+% lemma: A_Hb_Hc:
+%-----------------------
+%fof(th_A_Hb_Hc, conjecture, inc(pA, b1) & inc(pHb1, b1) & inc(pA, c1) & inc(pHc1, c1) & perp(hb1, b1) & inc(pHb1, hb1) & perp(hc1, c1) & inc(pHc1, hc1) & inc(pB, hb1) & inc(pB, c1) & inc(pC, hc1) & inc(pC, b1) => pHb = pHb1 & pHc = pHc1).
+
+%-----------------------
+%lemma 506: Ha_Hb_H:
+%-----------------------
+fof(th_Ha_Hb_H,conjecture, ( ( inc(pC,a1) & inc(pC,b1) & inc(pA,b1) & inc(pA,ha1) & inc(pHb1,b1) & perp(b1,hb1) & inc(pB,a1) & inc(pB,hb1) & inc(pHa1,a1) & perp(a1,ha1) & inc(pH1,hb1) & inc(pHb1,hb1) & inc(pHa1,ha1) & inc(pH1,ha1) ) => ( pHa1=pHa & pHb1=pHb & pH1=pH) ) ).
+

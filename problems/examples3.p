@@ -112,7 +112,7 @@ fof(haHa, axiom, ![H] : (perp(H, bc) & inc(pHa, H) => ha = H)).
 fof(hbHb, axiom, ![H] : (perp(H, ac) & inc(pHb, H) => hb = H)).
 fof(hcHc, axiom, ![H] : (perp(H, ab) & inc(pHc, H) => hc = H)).
 fof(circle_over_sym1, axiom, ![P1, P2, K1, K2] : (P1 != P2 & circle_over(K1, P1, P2) & circle_over(K2, P1, P2) => K1 = K2)).
-fof(circle_over_sym2, axiom, ![P1, P2, K1] : (P1 != P2 & circle_over(K1, P1, P2) => circle_over(K1, P2, P1)).
+fof(circle_over_sym2, axiom, ![P1, P2, K1] : (P1 != P2 & circle_over(K1, P1, P2) => circle_over(K1, P2, P1))).
 fof(pHa_def, axiom, ![H1] : (inc(H1, ha) & inc(H1, bc) => H1 = pHa)).
 fof(pHb_def, axiom, ![H1] : (inc(H1, hb) & inc(H1, ac) => H1 = pHb)).
 fof(pHc_def, axiom, ![H1] : (inc(H1, hc) & inc(H1, ab) => H1 = pHc)).
@@ -145,4 +145,11 @@ fof(pH_unique3, axiom, ![H1] : (inc(H1, hb) & inc(H1, hc) => H1 = pH)).
 %-----------------------
 % lemma: A_O_Hb:
 %-----------------------
-fof(th_A_O_Hb, conjecture, (inc(pA, b1) & inc(pHb1, b1) & inc_c(pA, k) & center(pO1, k) & inc_c(pC, k) & inc(pC, b1) & inc(pHb1, hb1) & perp(hb1, b1) & inc_c(pB, k) & inc(pB, hb1) => pHb = pHb1 & pO1 = pOc)).
+%fof(th_A_O_Hb, conjecture, (inc(pA, b1) & inc(pHb1, b1) & inc_c(pA, k) & center(pO1, k) & inc_c(pC, k) & inc(pC, b1) & inc(pHb1, hb1) & perp(hb1, b1) & inc_c(pB, k) & inc(pB, hb1) => pHb = pHb1 & pO1 = pOc)).
+
+%-----------------------
+%lemma 305: O_G_Ha:
+%-----------------------
+fof(th_O_G_Ha,conjecture, ( ( inc_c(pC,c) & inc_c(pB,c) & inc(pC,a1) & inc(pB,a1) & center(pO1,c) & inc_c(pA,c) & ratio13(pMa1,pG1,pMa1,pA) & inc(pMa1,a1) & inc(pMa1,ma1) & inc(pO1,ma1) & perp(a1,ma1) & inc(pHa1,a1) & perp(ha1,a1) & inc(pHa1,ha1) & inc(pH1,ha1) & ratio13(pO1,pG1,pO1,pH1)) => ( pO1=pOc & pG1=pG & pHa1=pHa) ) ).
+
+
