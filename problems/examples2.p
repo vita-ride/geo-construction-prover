@@ -91,7 +91,7 @@ fof(bc_unique, axiom, ![L] : (inc(pB, L) & inc(pC, L) => L = bc)).
 fof(sides_distinct, axiom, ab != ac & ab != bc & ac != bc).
 fof(altitudes_non_sides, axiom, ha != bc & hb != ac & hc != ab).
 fof(circle_over_sym1, axiom, ![P1, P2, K1, K2] : (P1 != P2 & circle_over(K1, P1, P2) & circle_over(K2, P1, P2) => K1 = K2)).
-fof(circle_over_sym2, axiom, ![P1, P2, K1] : (P1 != P2 & circle_over(K1, P1, P2) => circle_over(K1, P2, P1)).
+fof(circle_over_sym2, axiom, ![P1, P2, K1] : (P1 != P2 & circle_over(K1, P1, P2) => circle_over(K1, P2, P1))).
 fof(cc_unique, axiom, ![C] : (inc_c(pA, C) & inc_c(pB, C) & inc_c(pC, C) => C = cc)).
 fof(oc_unique, axiom, ![C] : (inc_c(pA, C) & inc_c(pB, C) & inc_c(pC, C) & center(pO1, C) => pO1 = pOc)).
 fof(inc_midpoint, axiom, ![X, Y, M, L] : (X != Y & midpoint(M, X, Y) & line(X, Y, L) => inc(M, L))).
@@ -115,7 +115,7 @@ fof(perp_para, axiom, ![Lba, Lha, A] : (perp(Lha, A) & para(Lba, Lha) => perp(Lb
 %-----------------------
 % lemma: A_Mb_G:
 %-----------------------
-%fof(th_A_Mb_G1, conjecture, midpoint(pMb1, pA, pC) & ratio23(pB, pG1, pB, pMb1) => pMb = pMb1 & pG = pG1).
+%fof(th_A_Mb_G, conjecture, midpoint(pMb1, pA, pC) & ratio23(pB, pG1, pB, pMb1) => pMb = pMb1 & pG = pG1).
 
 %-----------------------
 % lemma: A_O_Ma:
@@ -125,4 +125,12 @@ fof(perp_para, axiom, ![Lba, Lha, A] : (perp(Lha, A) & para(Lba, Lha) => perp(Lb
 %-----------------------
 % lemma: A_Mb_Mc:
 %-----------------------
-fof(th_A_Mb_Mc, conjecture, (midpoint(pMb1, pA, pC) & midpoint(pMc1, pA, pB) => pMb = pMb1 & pMc = pMc1)).
+%fof(th_A_Mb_Mc, conjecture, (midpoint(pMb1, pA, pC) & midpoint(pMc1, pA, pB) => pMb = pMb1 & pMc = pMc1)).
+
+%-----------------------
+%lemma 363: Ma_G_H:
+%-----------------------
+fof(th_Ma_G_H,conjecture, (inc_c(pB,cc1) & inc_c(pC,cc1) & inc(pB,a1) & inc(pC,a1) & inc(pMa1,a1) & perp(ma1,a1) & center(pO1,cc1) & inc_c(pA,cc1) & inc(pO1,ma1) & inc(pMa1,ma1) & ratio23(pH1,pG1,pH1,pO1) & ratio23(pA,pG1,pA,pMa1) => ( pMa=pMa1 & pH=pH1 & pG=pG1 ) ) ).
+
+
+
