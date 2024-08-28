@@ -150,6 +150,14 @@ fof(pH_unique3, axiom, ![H1] : (inc(H1, hb) & inc(H1, hc) => H1 = pH)).
 %-----------------------
 %lemma 305: O_G_Ha:
 %-----------------------
-fof(th_O_G_Ha,conjecture, ( ( inc_c(pC,c) & inc_c(pB,c) & inc(pC,a1) & inc(pB,a1) & center(pO1,c) & inc_c(pA,c) & ratio13(pMa1,pG1,pMa1,pA) & inc(pMa1,a1) & inc(pMa1,ma1) & inc(pO1,ma1) & perp(a1,ma1) & inc(pHa1,a1) & perp(ha1,a1) & inc(pHa1,ha1) & inc(pH1,ha1) & ratio13(pO1,pG1,pO1,pH1)) => ( pO1=pOc & pG1=pG & pHa1=pHa) ) ).
+%fof(th_O_G_Ha,conjecture, ( ( inc_c(pC,c) & inc_c(pB,c) & inc(pC,a1) & inc(pB,a1) & center(pO1,c) & inc_c(pA,c) & ratio13(pMa1,pG1,pMa1,pA) & inc(pMa1,a1) & inc(pMa1,ma1) & inc(pO1,ma1) & perp(a1,ma1) & inc(pHa1,a1) & perp(ha1,a1) & inc(pHa1,ha1) & inc(pH1,ha1) & ratio13(pO1,pG1,pO1,pH1)) => ( pO1=pOc & pG1=pG & pHa1=pHa) ) ).
 
+%-----------------------
+%lemma 281: O_Ma_H:
+%-----------------------
+%fof(th_O_Ma_H,conjecture, ( (ratio23(pH1,pG1,pH1,pOc1) & ratio23(pA,pG1,pA,pMa1) & inc(pMa1,m1) & inc(pOc1,m1) & center(pOc1,k1) & inc_c(pA,k1) & inc(pMa1,a1) & perp(a1,m1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1) & pA!=pH1) => (pMa1=pMa & pOc=pOc1) ) ).
 
+%-----------------------
+%lemma 315: O_Ha_H:
+%-----------------------
+fof(th_O_Ha_H,conjecture, ( (ratio23(pH1,pG1,pH1,pOc1) & inc(pHa1,ha1) & inc(pH1,ha1) & inc(pHa1,a1) & perp(a1,ha1) & inc(pOc1,ma1) & perp(ma1,a1) & inc(pMa1,ma1) & inc(pMa1,a1) & ratio23(pA,pG1,pA,pMa1) & center(pOc1,k1) & inc_c(pA,k1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1)) => (pOc1=pOc & pHa1=pHa & pH1=pH) ) ).
