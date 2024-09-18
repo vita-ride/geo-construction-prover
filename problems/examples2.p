@@ -130,7 +130,10 @@ fof(perp_para, axiom, ![Lba, Lha, A] : (perp(Lha, A) & para(Lba, Lha) => perp(Lb
 %-----------------------
 %lemma 363: Ma_G_H:
 %-----------------------
-fof(th_Ma_G_H,conjecture, (inc_c(pB,cc1) & inc_c(pC,cc1) & inc(pB,a1) & inc(pC,a1) & inc(pMa1,a1) & perp(ma1,a1) & center(pO1,cc1) & inc_c(pA,cc1) & inc(pO1,ma1) & inc(pMa1,ma1) & ratio23(pH1,pG1,pH1,pO1) & ratio23(pA,pG1,pA,pMa1) => ( pMa=pMa1 & pH=pH1 & pG=pG1 ) ) ).
+%fof(th_Ma_G_H,conjecture, (inc_c(pB,cc1) & inc_c(pC,cc1) & inc(pB,a1) & inc(pC,a1) & inc(pMa1,a1) & perp(ma1,a1) & center(pO1,cc1) & inc_c(pA,cc1) & inc(pO1,ma1) & inc(pMa1,ma1) & ratio23(pH1,pG1,pH1,pO1) & ratio23(pA,pG1,pA,pMa1) => ( pMa=pMa1 & pH=pH1 & pG=pG1 ) ) ).
 
-
+%-----------------------
+%lemma 277: O_Ma_G:
+%-----------------------
+fof(th_O_Ma_G,conjecture, ( ( inc_c(pA,k) & inc_c(pB,k) & inc_c(pC,k) & center(pOc1, k) & inc(pMa1, ma1) & inc(pOc1, ma1) & inc(pMa1, a1) & perp(ma1, a1) & inc(pB, a1) & inc(pC, a1) & ratio13(pMa1,pG1,pMa1,pA)) => ( pOc=pOc1 & pMa1=pMa & pG=pG1) ) ).
 

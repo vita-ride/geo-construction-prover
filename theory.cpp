@@ -82,8 +82,10 @@ bool Theory::readTPTP(const string inputFile){
                 addAxiom(f, name);
                 updateSignature(f);
             } else if (type == eConjecture) {
-                if (!setTheorem(f, name))
+                if (!setTheorem(f, name)) {
+                    cout << "Error: more than 1 conjecture given" << endl;
                     return false;
+                }
                 updateSignature(f);
             }
         } else {
