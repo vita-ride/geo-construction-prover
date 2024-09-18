@@ -82,8 +82,10 @@ bool Theory::readTPTP(const string inputFile){
                 addAxiom(f, name);
                 updateSignature(f);
             } else if (type == eConjecture) {
-                if (!setTheorem(f, name))
+                if (!setTheorem(f, name)) {
+                    cout << "Error: more than 1 conjecture given" << endl;
                     return false;
+                }
                 updateSignature(f);
             }
         } else {
@@ -460,7 +462,6 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
         result.addReplacements(repl);
     }
 
-    //todo add missing univ vars (if nf1 doesn't use some in premise)
     return true;
 }
 

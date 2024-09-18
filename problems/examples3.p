@@ -242,8 +242,8 @@ fof(pG_C_unique, axiom, ![X,X1,X2]: (ratio23(pC, X, pC, X1) & ratio13(pOc, X, pO
 %lemma 71: A_G_Hb:
 %-----------------------
 %fof(th_A_G_Hb,conjecture, ( (midpoint(pMc1,pA,pB) & ratio23(pC,pG1,pC,pMc1) & inc_c(pC,cc1) & inc(pC,b1) & pC!=pHb1 & center(pMa1,cc1) & inc_c(pHb1,cc1) & inc(pHb1,b1) & inc(pA,b1) & ratio23(pA,pG1,pA,pMa1)) => ( pG=pG1 & pHb1=pHb) ) ).
-%-----------------------
 
+%-----------------------
 %lemma 73: A_G_H:
 %-----------------------
 %fof(th_A_G_H,conjecture, ( ( ratio23(pA,pG1,pA,pMa1) & ratio23(pH1,pG1,pH1,pOc1) & inc(pA,ha1) & inc(pH1,ha1) & inc_c(pA,cc1) & center(pOc1,cc1) & inc(pMa1,a1) & perp(a1,ha1) & inc_c(pB,cc1) & inc_c(pC,cc1) & inc(pB,a1) & inc(pC,a1) & pOc1!=pMa1 & pH1!=pA) => ( pG=pG1 & pH1=pH) ) ).

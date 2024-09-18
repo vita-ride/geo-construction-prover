@@ -1,5 +1,4 @@
 #include "prover.h"
-
 string findParent(unordered_map<string, string>& parent, string x) {
     if (parent[x].empty())
         return x;
@@ -19,7 +18,7 @@ void Prover::initAxioms() {
     theory.saturate();
 }
 
-void Prover::prove() {
+bool Prover::prove() {
     cout << "Theorem to prove:" << endl << "\t" << theory.getTheorem().second
          << ": " << theory.getTheorem().first << endl
          << "Assumptions:" << endl;
@@ -71,17 +70,25 @@ void Prover::prove() {
     if (goals.empty()) {
         cout << "Proof successful!" << endl;
         theory.printProof();
+        return true;
     } else {
         cout << "Proof failed: ";
         if (contradiction) {
             cout << "arrived at contradiction:" << endl;
             theory.printProof(true);
-        } else if (depth >= MAX_SEARCH_DEPTH) {
-            cout << "maximum depth exceeded." << endl;
         } else {
-            cout << "reached fixed point." << endl;
+            if (depth >= MAX_SEARCH_DEPTH) {
+                cout << "maximum depth exceeded." << endl;
+            } else {
+                cout << "reached fixed point." << endl;
+            }
+            cout << "Unproven goals:" << endl;
+            for (const Atomic goal : goals) {
+                cout << goal << endl;
+            }
         }
     }
+    return false;
 }
 
 void Prover::generateFacts(NormFormula nf, set<NormFormula> &newFacts,
@@ -154,112 +161,37 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
     Atomic premise = nf.premiseBack();
     Atomic conc = f.getConclusion();
 
-    // univ variables from conclusion matching with constants in premise
-    unordered_map<string, string> univToConst;
-    for (size_t i = 0; i < premise.arity(); i++) {
-        if (!theory.isConstant(premise.argAt(i))) continue;
-        if (theory.isConstant(conc.argAt(i))) {
-            if (premise.argAt(i) != conc.argAt(i))
-                return false;
-        } else if (univToConst.find(conc.argAt(i).getName()) !=
-                   univToConst.end()) {
-            if (univToConst[conc.argAt(i).getName()] != premise.argAt(i).getName())
-                return false;
-        } else {
-            univToConst[conc.argAt(i).getName()] = premise.argAt(i).getName();
-        }
-    }
-    // univ variables from premise matching with constants in conclusion
-    unordered_map<string, string> replConst;
-
-    // univ variables from conclusion matching with univ variables in premise
-    unordered_map<string, unordered_set<string>> univToUniv;
+    UnionManager um;
 
     for (size_t i = 0; i < premise.arity(); i++) {
-        if (theory.isConstant(premise.argAt(i))) continue;
-        if (theory.isConstant(conc.argAt(i))) {
-            if (replConst.find(premise.argAt(i).getName()) !=
-                replConst.end()) {
-                if (replConst[premise.argAt(i).getName()] != conc.argAt(i).getName())
+        Term arg1 = premise.argAt(i);
+        Term arg2 = conc.argAt(i);
+
+        if (theory.isConstant(arg1)) {
+            if (theory.isConstant(arg2)) {
+                if (arg1 != arg2)
                     return false;
             } else {
-                replConst[premise.argAt(i).getName()] = conc.argAt(i).getName();
+                if (!um.addConstant(arg2.getName(), arg1.getName(), true))
+                    return false;
             }
         } else {
-            if (univToConst.find(conc.argAt(i).getName()) != univToConst.end()) {
-                if (replConst.find(premise.argAt(i).getName()) != replConst.end()) {
-                    if (replConst[premise.argAt(i).getName()] !=
-                        univToConst[conc.argAt(i).getName()])
-                        return false;
-                } else {
-                    replConst[premise.argAt(i).getName()] =
-                        univToConst[conc.argAt(i).getName()];
-                }
-            }
-            univToUniv[conc.argAt(i).getName()].insert(premise.argAt(i).getName());
-        }
-    }
-
-    // init parents map
-    unordered_map<string, string> parents;
-    for (auto it = univToUniv.begin(); it != univToUniv.end(); it++) {
-        const unordered_set<string> &univSet = it->second;
-        auto curr = univSet.begin();
-        string first = *curr;
-        curr++;
-        while (curr != univSet.end()) {
-            string root1 = findParent(parents, first);
-            string root2 = findParent(parents, *curr);
-            if (root1 != root2)
-                parents[root2] = root1;
-            curr++;
-        }
-    }
-    // prefer to use univ vars with lower index
-    unordered_set<string> pickedParents;
-    for (size_t i = 0; i < nf.numUnivVars(); i++) {
-        string univVar = nf.univVarAt(i);
-        string par = findParent(parents, univVar);
-        if (pickedParents.find(par) != pickedParents.end()) {
-            if (univVar != par) {
-                parents[univVar] = "";
-                parents[par] = univVar;
-            }
-            pickedParents.insert(univVar);
-        }
-    }
-
-    // update replConst for parents
-    for (size_t i = 0; i < nf.numUnivVars(); i++) {
-        string univVar = nf.univVarAt(i);
-        string par = findParent(parents, univVar);
-        if (univVar != par && replConst.find(univVar) != replConst.end()) {
-            if (replConst.find(par) != replConst.end()) {
-                if (replConst[par] != replConst[univVar]) {
+            if (theory.isConstant(arg2)) {
+                if (!um.addConstant(arg1.getName(), arg2.getName()))
                     return false;
-                }
             } else {
-                replConst[par] = replConst[univVar];
+                if (!um.makeUnion(arg1.getName(), arg2.getName()))
+                    return false;
             }
         }
     }
 
+    unordered_map<string,string> repl = um.getReplacements(nf.getUnivVars());
     vector<string> representatives;
-    unordered_map<string, string> repl;
+
     for (size_t i = 0; i < nf.numUnivVars(); i++) {
-        string univVar = nf.univVarAt(i);
-        string par = findParent(parents, univVar);
-        if (univVar == par) {
-            if (replConst.find(univVar) != replConst.end())
-                repl[univVar] = replConst[univVar];
-            else
-                representatives.push_back(univVar);
-        } else {
-            if (replConst.find(par) != replConst.end())
-                repl[univVar] = replConst[par];
-            else
-                repl[univVar] = par;
-        }
+        if (repl.find(nf.univVarAt(i)) == repl.end())
+            representatives.push_back(nf.univVarAt(i));
     }
 
     Conjunction mergedPremises;
@@ -289,6 +221,77 @@ bool Prover::canMerge(const NormFormula &nf, const NormFormula &f, NormFormula &
     merged.addReplacements(repl);
 
     return true;
+}
+
+
+string UnionManager::representative(const string &name, bool fact){
+    string x = fact ? secondaryPrefix + name : name;
+    if (parent.find(x) == parent.end())
+        return x;
+    parent[x] = representative(parent[x]);
+    return parent[x];
+}
+
+bool UnionManager::makeUnion(const string &a, const string &b){
+    string reprA = representative(a);
+    string reprB = representative(b, true);
+
+    if (reprA == reprB)
+        return true;
+
+    if (reprA[0] == constantPrefix) {
+        if (reprB[0] == constantPrefix) {
+            return false;
+        }
+    } else if (reprB[0] == constantPrefix) {
+        parent[reprA] = reprB;
+        return true;
+    }
+
+    parent[reprB] = reprA;
+    return true;
+}
+
+bool UnionManager::addConstant(const string &var, const string &c, bool fact){
+    string repr = representative(var, fact);
+    string constantName = constantPrefix + c;
+
+    if (repr == constantName)
+        return true;
+
+    if (repr[0] == constantPrefix)
+        return false;
+
+    parent[repr] = constantName;
+    return true;
+}
+
+unordered_map<string,string> UnionManager::getReplacements(const vector<string> &vars) {
+    unordered_map<string,size_t> varIndex;
+    for (size_t i = 0; i < vars.size(); i++) {
+        varIndex[vars.at(i)] = i;
+    }
+
+    unordered_map<string,string> replacements;
+    for (size_t i = 0; i < vars.size(); i++) {
+        string var = vars.at(i);
+        string repr = representative(var);
+
+        if (var == repr)
+            continue;
+
+        if (repr[0] == constantPrefix) {
+            replacements[var] = repr.substr(1, repr.length()-1);
+        } else {
+            if (i < varIndex[repr]) {
+                parent.erase(var);
+                parent[repr] = var;
+            } else {
+                replacements[var] = repr;
+            }
+        }
+    }
+    return replacements;
 }
 
 

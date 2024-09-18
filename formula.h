@@ -216,6 +216,7 @@ public:
     size_t numUnivVars() const { return universalVars.size(); }
     const string &univVarAt(size_t i) const { return universalVars.at(i); }
     void addUnivVar(const string &varName) { universalVars.push_back(varName); }
+    const vector<string> &getUnivVars() const { return universalVars; }
     void setUnivVars(const vector<string> &vars) { universalVars = vars; }
 
     bool isUniv(const string &var) const;
