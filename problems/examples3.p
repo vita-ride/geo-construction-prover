@@ -50,6 +50,7 @@ fof(perp_bisc_ab, axiom, perp(bisc, ab)).
 fof(inc_Oc_bisa, axiom, inc(pOc, bisa)).
 fof(inc_Oc_bisb, axiom, inc(pOc, bisb)).
 fof(inc_Oc_bisc, axiom, inc(pOc, bisc)).
+
 fof(inc_Hb_cBC, axiom, inc_c(pHb, cobc)).
 fof(inc_Hc_cBC, axiom, inc_c(pHc, cobc)).
 fof(inc_Ha_cAC, axiom, inc_c(pHa, coac)).
@@ -140,6 +141,39 @@ fof(pH_unique1, axiom, ![H1] : (inc(H1, ha) & inc(H1, hb) => H1 = pH)).
 fof(pH_unique2, axiom, ![H1] : (inc(H1, ha) & inc(H1, hc) => H1 = pH)).
 fof(pH_unique3, axiom, ![H1] : (inc(H1, hb) & inc(H1, hc) => H1 = pH)).
 
+fof(cobc_def, axiom, circle_over(cobc, pB, pC)).
+fof(coac_def, axiom, circle_over(coac, pA, pC)).
+fof(coab_def, axiom, circle_over(coab, pA, pB)).
+
+
+% ADDITIONAL AXIOMS
+
+fof(pHa_BC_cAB_unique, axiom, ![P] (P != pB & inc(P, bc) & inc_c(P, coab) => P = pHa)).
+fof(pHa_BC_cAC_unique, axiom, ![P] (P != pC & inc(P, bc) & inc_c(P, coac) => P = pHa)).
+
+fof(pHb_AC_cBC_unique, axiom, ![P] (P != pC & inc(P, ac) & inc_c(P, cobc) => P = pHb)).
+fof(pHb_AC_cAB_unique, axiom, ![P] (P != pA & inc(P, ac) & inc_c(P, coab) => P = pHb)).
+
+fof(pHc_AB_cAC_unique, axiom, ![P] (P != pA & inc(P, ab) & inc_c(P, coac) => P = pHc)).
+fof(pHc_AB_cBC_unique, axiom, ![P] (P != pB & inc(P, ab) & inc_c(P, cobc) => P = pHc)).
+
+fof(pHa_cAB_cAC_unique, axiom, ![P] (P != pA & inc_c(P, coab) & inc_c(P, coac) => P = pHa)).
+fof(pHb_cAB_cBC_unique, axiom, ![P] (P != pB & inc_c(P, coab) & inc_c(P, cobc) => P = pHb)).
+fof(pHc_cAC_cBC_unique, axiom, ![P] (P != pC & inc_c(P, coac) & inc_c(P, cobc) => P = pHc)).
+
+%fof(circle_line_midpoint, axiom, ![P,P1,P2,C,L] (P1 != P2 & center(P, C) & inc_c(P1, C) & inc_c(P2, C) & inc(P,L) & inc(P1,L) & inc(P2,L) => midpoint(P, P1, P2))).
+fof(circle_over_line, axiom, ![P,P1,P2,C,L] (P1 != P2 & center(P, C) & inc_c(P1, C) & inc_c(P2, C) & inc(P,L) & inc(P1,L) & inc(P2,L) => circle_over(C, P1, P2))).
+
+fof(pMa_para_intersect_unique, axiom, ![P, L1, L2] (inc(pMb,L1) & inc(P,L1) & para(L1,ab) & inc(pMc,L2) & inc(P,L2) & para(L2,ac) => P = pMc)).
+fof(pMb_para_intersect_unique, axiom, ![P, L1, L2] (inc(pMa,L1) & inc(P,L1) & para(L1,ab) & inc(pMc,L2) & inc(P,L2) & para(L2,bc) => P = pMc)).
+fof(pMc_para_intersect_unique, axiom, ![P, L1, L2] (inc(pMa,L1) & inc(P,L1) & para(L1,ac) & inc(pMb,L2) & inc(P,L2) & para(L2,bc) => P = pMc)).
+
+fof(bis_distinct, axiom, (bisa != bisb & bisa != bisc & bisb != bisc)).
+
+fof(pG_A_unique, axiom, ![X,X1,X2]: (ratio23(pA, X, pA, X1) & ratio13(pOc, X, pOc, X2) & inc(X1,bc) & inc(X2,ha) => X = pG)).
+fof(pG_B_unique, axiom, ![X,X1,X2]: (ratio23(pB, X, pB, X1) & ratio13(pOc, X, pOc, X2) & inc(X1,ac) & inc(X2,hb) => X = pG)).
+fof(pG_C_unique, axiom, ![X,X1,X2]: (ratio23(pC, X, pC, X1) & ratio13(pOc, X, pOc, X2) & inc(X1,ab) & inc(X2,hc) => X = pG)).
+
 % CONJECTURE
 
 %-----------------------
@@ -160,4 +194,82 @@ fof(pH_unique3, axiom, ![H1] : (inc(H1, hb) & inc(H1, hc) => H1 = pH)).
 %-----------------------
 %lemma 315: O_Ha_H:
 %-----------------------
-fof(th_O_Ha_H,conjecture, ( (ratio23(pH1,pG1,pH1,pOc1) & inc(pHa1,ha1) & inc(pH1,ha1) & inc(pHa1,a1) & perp(a1,ha1) & inc(pOc1,ma1) & perp(ma1,a1) & inc(pMa1,ma1) & inc(pMa1,a1) & ratio23(pA,pG1,pA,pMa1) & center(pOc1,k1) & inc_c(pA,k1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1)) => (pOc1=pOc & pHa1=pHa & pH1=pH) ) ).
+%fof(th_O_Ha_H,conjecture, ( (ratio23(pH1,pG1,pH1,pOc1) & inc(pHa1,ha1) & inc(pH1,ha1) & inc(pHa1,a1) & perp(a1,ha1) & inc(pOc1,ma1) & perp(ma1,a1) & inc(pMa1,ma1) & inc(pMa1,a1) & ratio23(pA,pG1,pA,pMa1) & center(pOc1,k1) & inc_c(pA,k1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1)) => (pOc1=pOc & pHa1=pHa & pH1=pH) ) ).
+
+%----------------------- 
+%lemma 376: Ma_Hb_H:
+%-----------------------
+%fof(th_Ma_Hb_H,conjecture, ( ( pB != pHb1 & pC != pHc1 & pB != pHc1 & pC != pHb1 & inc(pA,b1) & inc(pA,c1) & inc(pB,c1) & inc(pHc1,c1) & inc_c(pHc1,k) & inc(pHc1,hc1) & inc_c(pC,k) & inc(pC,hc1) & inc(pH1,hc1) & inc(pC,hc1) & inc(pHb1,b1) & inc(pC,b1) & midpoint(pMa1,pB,pC) & inc(pHb1,hb1) & inc_c(pHb1,k) & inc(pB,hb1) & inc_c(pB,k) & center(pMa1,k) & inc(pHb1,hb1) & inc(pH1,hb1) ) => ( pMa1=pMa & pHb1=pHb & pH1=pH) ) ).
+
+%======================================================================================
+
+%-----------------------
+%lemma 44: A_Hb_Ma:
+%-----------------------
+%fof(th_A_Hb_Ma,conjecture, ( ( inc(pA,b1) & inc(pHb1,b1) & inc_c(pHb1,k) & center(pMa1,k) & inc(pC,b1) & inc_c(pC,k) & pC!=pHb1 & midpoint(pMa1,pB,pC) & pHb1!=pB ) => ( pHb=pHb1 &  pMa=pMa1 ) ) ).
+
+%-----------------------
+%lemma 275: O_Ma_Mb: 
+%-----------------------
+%fof(th_O_Ma_Mb,conjecture, ( ( inc(pO1,ma1) & inc(pMa1,ma1) & inc(pO1,mb1) & inc(pMb1,mb1) & inc(pMa1,a1) & perp(a1,ma1) & inc(pMb1,b1) & perp(b1,mb1) & inc(pC,a1) & inc(pC,b1) & midpoint(pMa1,pB,pC) & midpoint(pMb1,pA,pC) ) => ( pO1=pOc & pMa=pMa1 & pMb=pMb1 ) ) ).
+
+%-----------------------
+%lemma 279: O_Ma_Hb: 
+%-----------------------
+%fof(th_O_Ma_Hb,conjecture, ( ( pHb1 != pC & inc(pO1,ma1) & inc(pMa1,ma1) & inc_c(pHb1,k) & center(pMa1,k) & inc(pMa1,a1) & perp(a1,ma1) & inc(pB,a1) & inc(pC,a1) & inc_c(pB,k) & inc_c(pC,k) & inc(pC,b1) & inc(pHb1,b1) & inc_c(pB,k1) & center(pO1,k1) & inc(pA,b1) & inc(pC,b1) & inc_c(pA,k1) & inc_c(pC,k1) ) => (pO1 = pOc & pMa1=pMa & pHb1=pHb) ) ).
+
+%----------------------- 
+%lemma 343: Ma_Mb_Ha:
+%-----------------------
+%fof(th_Ma_Mb_Ha,conjecture, ( ( inc(pMa1,a1) & inc(pHa1,a1) & inc_c(pHa1,k) & center(pMb1,k) & inc_c(pC,k) & inc(pC,a1) & midpoint(pMa1,pB,pC) & midpoint(pMb1,pA,pC) & pHa1!=pC) => ( pMa=pMa1 & pMb=pMb1 & pHa=pHa1 ) ) ).
+
+%----------------------- 
+%lemma 345: Ma_Mb_Hc:
+%-----------------------
+%fof(th_Ma_Mb_Hc,conjecture, ( ( pHc1 != pC & inc_c(pHc1,k) & center(pMa1,k) & inc_c(pHc1,k1) & center(pMb1,k1) & inc_c(pC,k) & inc_c(pC,k1) & midpoint(pMa1,pB,pC) & midpoint(pMb1,pA,pC) ) => ( pMa=pMa1 & pMb=pMb1 & pHc=pHc1) ) ).
+
+%----------------------- 
+%lemma 368: Ma_Ha_Hb:
+%-----------------------
+%fof(th_Ma_Ha_Hb,conjecture, ( ( pHb1 != pC & inc(pA,b1) & inc(pA,ha1) & inc(pHa1,ha1) & perp(a1,ha1) & inc(pC,b1) & inc(pHb1,b1) & inc(pB,a1) & inc(pC,a1) & inc_c(pB,k) & inc_c(pC,k) & center(pMa1,k) & inc_c(pHb1,k) & inc(pMa1,a1) & inc(pHa1,a1) ) => ( pMa=pMa1 & pHa=pHa1 & pHb=pHb1) ) ).
+	
+%-----------------------
+%lemma 31: A_O_G:
+%-----------------------
+%fof(th_A_O_G,conjecture, ( (ratio23(pA,pG1,pA,pMa1) & ratio23(pH1,pG1,pH1,pOc1) & inc(pA,h1) & inc(pH1,h1) & center(pOc1,k1) & inc_c(pA,k1) & inc(pMa1,a1) & perp(a1,h1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1) & pA!=pH1) => ( pG=pG1 & pOc1=pOc) ) ).
+
+%-----------------------
+%lemma 71: A_G_Hb:
+%-----------------------
+%fof(th_A_G_Hb,conjecture, ( (midpoint(pMc1,pA,pB) & ratio23(pC,pG1,pC,pMc1) & inc_c(pC,cc1) & inc(pC,b1) & pC!=pHb1 & center(pMa1,cc1) & inc_c(pHb1,cc1) & inc(pHb1,b1) & inc(pA,b1) & ratio23(pA,pG1,pA,pMa1)) => ( pG=pG1 & pHb1=pHb) ) ).
+%-----------------------
+
+%lemma 73: A_G_H:
+%-----------------------
+%fof(th_A_G_H,conjecture, ( ( ratio23(pA,pG1,pA,pMa1) & ratio23(pH1,pG1,pH1,pOc1) & inc(pA,ha1) & inc(pH1,ha1) & inc_c(pA,cc1) & center(pOc1,cc1) & inc(pMa1,a1) & perp(a1,ha1) & inc_c(pB,cc1) & inc_c(pC,cc1) & inc(pB,a1) & inc(pC,a1) & pOc1!=pMa1 & pH1!=pA) => ( pG=pG1 & pH1=pH) ) ).
+
+%-----------------------
+%lemma 361: Ma_G_Hb:
+%-----------------------
+%fof(th_Ma_G_Hb,conjecture, (midpoint(pMa1,pB,pC) & inc(pC,b1) & inc_c(pC,k) & center(pMa1,k) & inc_c(pHb1,k) & pHb1!=pC & inc(pA,b1) & inc(pHb1,b1) & ratio23(pA,pG1,pA,pMa1) => ( pMa=pMa1 & pHb=pHb1 & pG=pG1 ) ) ).
+
+%-----------------------
+%lemma 479: G_Ha_H:
+%-----------------------
+%fof(th_G_Ha_H,conjecture, (inc_c(pB,cc1) & inc_c(pC,cc1) & inc(pB,a1) & inc(pC,a1) & center(pO1,cc1) & inc_c(pA,cc1)  & ratio23(pA,pG1,pA,pMa1) & inc(pMa1,a1) & inc(pMa1,ma1) & inc(pO1,ma1) & perp(a1,ma1) & inc(pHa1,a1) & perp(ha1,a1) & inc(pHa1,ha1) & inc(pH1,ha1) & ratio23(pH1,pG1,pH1,pO1) => ( pG=pG1 & pHa=pHa1 & pH=pH1 ) ) ).
+
+%-----------------------
+%lemma 35: A_O_H:
+%-----------------------
+%fof(th_A_O_H,conjecture, ( (ratio23(pH1,pG1,pH1,pOc1) & ratio23(pA,pG1,pA,pMa1) & inc(pA,h1) & inc(pH1,h1) & center(pOc1,k1) & inc_c(pA,k1) & inc(pMa1,a1) & perp(a1,h1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1) & pA!=pH1) => (pOc1=pOc & pH=pH1) ) ).
+
+%-----------------------
+%lemma 46: A_Ma_H:
+%-----------------------
+%fof(th_A_Ma_H,conjecture, ( (ratio23(pA,pG1,pA,pMa1) & ratio23(pH1,pG1,pH1,pOc1) & inc(pA,h1) & inc(pH1,h1) & center(pOc1,k1) & inc_c(pA,k1) & inc(pMa1,a1) & perp(a1,h1) & inc_c(pB,k1) & inc_c(pC,k1) & inc(pB,a1) & inc(pC,a1) & pA!=pH1) => (pMa1=pMa & pH=pH1) ) ).
+
+%----------------------- 
+%lemma 341: Ma_Mb_Mc:
+%-----------------------
+fof(th_Ma_Mb_Mc,conjecture, ( ( inc(pMa1,mac) & inc(pMc1,mac) & inc(pMb1,mbc) & inc(pMc1,mbc) & inc(pMa1,a1) & para(mbc,a1) & inc(pMb1,b1) & para(mac,b1) & inc(pC,b1) & inc(pC,a1) & midpoint(pMa1,pB,pC) & midpoint(pMb1,pA,pC) ) => ( pMa=pMa1 & pMb=pMb1 & pMc=pMc1) ) ).
+
