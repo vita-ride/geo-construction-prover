@@ -417,8 +417,8 @@ void Theory::saturateFacts(set<NormFormula> &fs) {
                         exists = facts.find(result) != facts.end();
                     if (!exists) {
                         result.setName(curr->getName() + "sat" + to_string(count++));
-                        fs.insert(result);
                         addOrigin(result, nf1.getName());
+                        fs.insert(result);
                         updated=true;
                     }
                 }
@@ -465,16 +465,65 @@ bool Theory::canSaturate(const NormFormula &nf1, const NormFormula &nf2,
     return true;
 }
 
+bool Theory::addIfCovered(const Atomic &fact, const string &name) {
+    NormFormula f;
+    f.setConclusion(fact);
+    f.setName(name);
+    if (facts.find(f) != facts.end()) {
+        addOrigin(f);
+        return true;
+    }
+    set<NormFormula>::iterator it = findFirst(facts, fact.getName(), 1);
+    while (it != facts.end() && it->getConclusion().getName() == fact.getName()) {
+        if (covers(*it, fact)) {
+            f.addUsedFact(pair(it->getName(), it->simpleString()));
+            addOrigin(f);
+            facts.insert(f);
+            return true;
+        }
+        it++;
+    }
+    return false;
+}
+
+bool Theory::covers(const NormFormula &univFact, const Atomic &fact) {
+    Atomic univ = univFact.getConclusion();
+
+    unordered_map<string, string> repl;
+
+    for (size_t i = 0; i < univ.arity(); i++) {
+        if (isConstant(univ.argAt(i))) {
+            if (univ.argAt(i) != fact.argAt(i))
+                return false;
+        } else if (repl.find(univ.argAt(i).getName()) != repl.end()) {
+            if (repl[univ.argAt(i).getName()] != fact.argAt(i).getName())
+                return false;
+        } else
+            repl[univ.argAt(i).getName()] = fact.argAt(i).getName();
+    }
+
+    return true;
+}
+
+void Theory::addOrigin(NormFormula &nf) {
+    Origin o(nf);
+    origins[nf.getName()] = o;
+    nf.clearOrigin();
+}
+
 void Theory::addOrigin(NormFormula &nf, const string &stepName) {
     Origin o(nf, stepName);
     origins[nf.getName()] = o;
     nf.clearOrigin();
 }
 
-set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate) {
+set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate, size_t numUniv) {
     Atomic conc(predicate);
     NormFormula searchFor;
     searchFor.setConclusion(conc);
+    for (size_t i = 0; i < numUniv; i++) {
+        searchFor.addUnivVar("A");
+    }
     return lower_bound(fs.begin(), fs.end(), searchFor);
 }
 
@@ -485,6 +534,7 @@ void Theory::printProof(bool isContradiction) {
     } else {
         for (size_t i = 0; i < goalNames.size(); i++) {
             printFactOrigin(goalNames.at(i));
+            cout << "(Goal reached)" << endl;
         }
     }
 }
@@ -493,6 +543,7 @@ void Theory::printFactOrigin(const string &name) {
     auto found = origins.find(name);
     if (found == origins.end())
         return;
+
     Origin &origin = found->second;
     if (origin.isPrinted())
         return;
@@ -500,16 +551,17 @@ void Theory::printFactOrigin(const string &name) {
     for (size_t i = 0; i < origin.numFacts(); i++) {
         printFactOrigin(origin.factAt(i).first);
     }
-
+    cout << origin.getFormula();
     if (origin.numFacts() > 0) {
-        cout << origin.getFormula() << " (from ";
+        cout << " (from ";
         for (size_t i = 0; i < origin.numFacts(); i++) {
             cout << origin.factAt(i).second;
             if (i < origin.numFacts() - 1)
                 cout << ", ";
         }
 
-        cout << " using " << origin.getStep();
+        if (origin.getStep().length() > 0)
+            cout << " using " << origin.getStep();
 
         if (!origin.getReplacements().empty()) {
             cout << "; instantiation: ";
@@ -520,9 +572,9 @@ void Theory::printFactOrigin(const string &name) {
                     cout << ", ";
             }
         }
-        cout << ")" << endl;
+        cout << ")";
     }
-
+    cout << endl;
     origin.setPrinted(true);
 }
 

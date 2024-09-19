@@ -67,6 +67,19 @@ bool Prover::prove() {
         depth++;
     } while (!goals.empty() && depth < MAX_SEARCH_DEPTH && !newFacts.empty() && !contradiction);
 
+    if (!goals.empty()) {
+        size_t counter = 0;
+        auto it = goals.begin();
+        while( it!=goals.end() ) {
+            string goalName = "goal_reached" + to_string(counter++);
+            if (!theory.addIfCovered(*it, goalName )) {
+                break;
+            }
+            it = goals.erase(it);
+            theory.addGoalName(goalName);
+        }
+    }
+
     if (goals.empty()) {
         cout << "Proof successful!" << endl;
         theory.printProof();

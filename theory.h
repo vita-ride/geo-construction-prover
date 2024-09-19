@@ -6,6 +6,10 @@
 class Origin {
 public:
     Origin() {}
+    Origin(const NormFormula &nf) {
+        formula = nf.getConclusion();
+        factsUsed = nf.getUsedFacts();
+    }
     Origin(const NormFormula &nf, const string &stepName) {
         formula = nf.getConclusion();
         factsUsed = nf.getUsedFacts();
@@ -73,6 +77,7 @@ public:
 
     void printFormulas();
 
+    void addOrigin(NormFormula &nf);
     void addOrigin(NormFormula &nf, const string &stepName);
     void addGoalName(const string &name) { goalNames.push_back(name); }
 
@@ -81,6 +86,8 @@ public:
     void printProof(bool isContradiction = false);
     void printFactOrigin(const string &name);
 
+    bool addIfCovered(const Atomic &fact, const string &name);
+    bool covers(const NormFormula &univFact, const Atomic &fact);
 private:
     vector<pair<Formula, string>> initialAxioms;
     pair<Formula, string> theorem;
@@ -99,6 +106,6 @@ private:
     string contradictionName;
 };
 
-set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate);
+set<NormFormula>::iterator findFirst(const set<NormFormula> &fs, const string &predicate, size_t numUniv = 0);
 
 #endif // THEORY_H
